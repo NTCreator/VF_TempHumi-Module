@@ -1,0 +1,1005 @@
+VERSION "VF_E-Drive Data Logger v1.5 - GPS + rung (0x2xx) + goc (0x3xx) + nhiet-am (0x4xx)"
+
+
+NS_ :
+	CM_
+	BA_DEF_
+	BA_
+	VAL_
+	BA_DEF_DEF_
+	VAL_TABLE_
+
+BS_:
+
+BU_: VF_Main VIB_01 VIB_02 VIB_03 VIB_04 VIB_05 VIB_06 VIB_07 VIB_08 VIB_09 VIB_10 ANG_01 ANG_02 ANG_03 ANG_04 ANG_05 ANG_06 ANG_07 ANG_08 ANG_09 ANG_10 TH_01 TH_02 TH_03 TH_04 TH_05 TH_06 TH_07 TH_08 TH_09 TH_10
+
+
+BO_ 1536 GPS_Position: 8 VF_Main
+ SG_ Latitude : 0|32@1- (1E-007,0) [-90|90] "deg" Vector__XXX
+ SG_ Longitude : 32|32@1- (1E-007,0) [-180|180] "deg" Vector__XXX
+
+BO_ 1537 GPS_Motion: 8 VF_Main
+ SG_ Altitude : 0|32@1- (0.001,0) [-10000|20000] "m" Vector__XXX
+ SG_ Speed : 32|16@1+ (0.01,0) [0|655.35] "km/h" Vector__XXX
+ SG_ Heading : 48|16@1+ (0.01,0) [0|655.35] "deg" Vector__XXX
+
+BO_ 1538 GPS_Quality: 8 VF_Main
+ SG_ FixType : 0|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ NumSV : 8|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ HAcc : 16|16@1+ (0.01,0) [0|655.35] "m" Vector__XXX
+ SG_ VAcc : 32|16@1+ (0.01,0) [0|655.35] "m" Vector__XXX
+ SG_ PDOP : 48|16@1+ (0.01,0) [0|655.35] "" Vector__XXX
+
+BO_ 1539 GPS_Time: 8 VF_Main
+ SG_ UnixSeconds : 0|32@1+ (1,0) [0|4294967295] "s" Vector__XXX
+ SG_ Millisecond : 32|16@1+ (1,0) [0|999] "ms" Vector__XXX
+ SG_ ValidFlags : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+
+
+BO_ 512 VIB_Data_01: 8 VIB_01
+ SG_ RmsX : 0|16@1+ (0.25,0) [0|16383.75] "mg" Vector__XXX
+ SG_ RmsY : 16|16@1+ (0.25,0) [0|16383.75] "mg" Vector__XXX
+ SG_ RmsZ : 32|16@1+ (0.25,0) [0|16383.75] "mg" Vector__XXX
+ SG_ Counter : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 513 VIB_Status_01: 8 VIB_01
+ SG_ NodeId : 0|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ FwVersion : 8|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ FullScale : 16|8@1+ (1,0) [0|16] "g" Vector__XXX
+ SG_ Temperature : 24|8@1- (1,0) [-40|105] "degC" Vector__XXX
+ SG_ Peak1s : 32|16@1+ (0.25,0) [0|16383.75] "mg" Vector__XXX
+ SG_ FifoOverruns : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ StatusFlags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 528 VIB_Data_02: 8 VIB_02
+ SG_ RmsX : 0|16@1+ (0.25,0) [0|16383.75] "mg" Vector__XXX
+ SG_ RmsY : 16|16@1+ (0.25,0) [0|16383.75] "mg" Vector__XXX
+ SG_ RmsZ : 32|16@1+ (0.25,0) [0|16383.75] "mg" Vector__XXX
+ SG_ Counter : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 529 VIB_Status_02: 8 VIB_02
+ SG_ NodeId : 0|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ FwVersion : 8|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ FullScale : 16|8@1+ (1,0) [0|16] "g" Vector__XXX
+ SG_ Temperature : 24|8@1- (1,0) [-40|105] "degC" Vector__XXX
+ SG_ Peak1s : 32|16@1+ (0.25,0) [0|16383.75] "mg" Vector__XXX
+ SG_ FifoOverruns : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ StatusFlags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 544 VIB_Data_03: 8 VIB_03
+ SG_ RmsX : 0|16@1+ (0.25,0) [0|16383.75] "mg" Vector__XXX
+ SG_ RmsY : 16|16@1+ (0.25,0) [0|16383.75] "mg" Vector__XXX
+ SG_ RmsZ : 32|16@1+ (0.25,0) [0|16383.75] "mg" Vector__XXX
+ SG_ Counter : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 545 VIB_Status_03: 8 VIB_03
+ SG_ NodeId : 0|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ FwVersion : 8|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ FullScale : 16|8@1+ (1,0) [0|16] "g" Vector__XXX
+ SG_ Temperature : 24|8@1- (1,0) [-40|105] "degC" Vector__XXX
+ SG_ Peak1s : 32|16@1+ (0.25,0) [0|16383.75] "mg" Vector__XXX
+ SG_ FifoOverruns : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ StatusFlags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 560 VIB_Data_04: 8 VIB_04
+ SG_ RmsX : 0|16@1+ (0.25,0) [0|16383.75] "mg" Vector__XXX
+ SG_ RmsY : 16|16@1+ (0.25,0) [0|16383.75] "mg" Vector__XXX
+ SG_ RmsZ : 32|16@1+ (0.25,0) [0|16383.75] "mg" Vector__XXX
+ SG_ Counter : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 561 VIB_Status_04: 8 VIB_04
+ SG_ NodeId : 0|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ FwVersion : 8|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ FullScale : 16|8@1+ (1,0) [0|16] "g" Vector__XXX
+ SG_ Temperature : 24|8@1- (1,0) [-40|105] "degC" Vector__XXX
+ SG_ Peak1s : 32|16@1+ (0.25,0) [0|16383.75] "mg" Vector__XXX
+ SG_ FifoOverruns : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ StatusFlags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 576 VIB_Data_05: 8 VIB_05
+ SG_ RmsX : 0|16@1+ (0.25,0) [0|16383.75] "mg" Vector__XXX
+ SG_ RmsY : 16|16@1+ (0.25,0) [0|16383.75] "mg" Vector__XXX
+ SG_ RmsZ : 32|16@1+ (0.25,0) [0|16383.75] "mg" Vector__XXX
+ SG_ Counter : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 577 VIB_Status_05: 8 VIB_05
+ SG_ NodeId : 0|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ FwVersion : 8|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ FullScale : 16|8@1+ (1,0) [0|16] "g" Vector__XXX
+ SG_ Temperature : 24|8@1- (1,0) [-40|105] "degC" Vector__XXX
+ SG_ Peak1s : 32|16@1+ (0.25,0) [0|16383.75] "mg" Vector__XXX
+ SG_ FifoOverruns : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ StatusFlags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 592 VIB_Data_06: 8 VIB_06
+ SG_ RmsX : 0|16@1+ (0.25,0) [0|16383.75] "mg" Vector__XXX
+ SG_ RmsY : 16|16@1+ (0.25,0) [0|16383.75] "mg" Vector__XXX
+ SG_ RmsZ : 32|16@1+ (0.25,0) [0|16383.75] "mg" Vector__XXX
+ SG_ Counter : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 593 VIB_Status_06: 8 VIB_06
+ SG_ NodeId : 0|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ FwVersion : 8|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ FullScale : 16|8@1+ (1,0) [0|16] "g" Vector__XXX
+ SG_ Temperature : 24|8@1- (1,0) [-40|105] "degC" Vector__XXX
+ SG_ Peak1s : 32|16@1+ (0.25,0) [0|16383.75] "mg" Vector__XXX
+ SG_ FifoOverruns : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ StatusFlags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 608 VIB_Data_07: 8 VIB_07
+ SG_ RmsX : 0|16@1+ (0.25,0) [0|16383.75] "mg" Vector__XXX
+ SG_ RmsY : 16|16@1+ (0.25,0) [0|16383.75] "mg" Vector__XXX
+ SG_ RmsZ : 32|16@1+ (0.25,0) [0|16383.75] "mg" Vector__XXX
+ SG_ Counter : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 609 VIB_Status_07: 8 VIB_07
+ SG_ NodeId : 0|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ FwVersion : 8|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ FullScale : 16|8@1+ (1,0) [0|16] "g" Vector__XXX
+ SG_ Temperature : 24|8@1- (1,0) [-40|105] "degC" Vector__XXX
+ SG_ Peak1s : 32|16@1+ (0.25,0) [0|16383.75] "mg" Vector__XXX
+ SG_ FifoOverruns : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ StatusFlags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 624 VIB_Data_08: 8 VIB_08
+ SG_ RmsX : 0|16@1+ (0.25,0) [0|16383.75] "mg" Vector__XXX
+ SG_ RmsY : 16|16@1+ (0.25,0) [0|16383.75] "mg" Vector__XXX
+ SG_ RmsZ : 32|16@1+ (0.25,0) [0|16383.75] "mg" Vector__XXX
+ SG_ Counter : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 625 VIB_Status_08: 8 VIB_08
+ SG_ NodeId : 0|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ FwVersion : 8|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ FullScale : 16|8@1+ (1,0) [0|16] "g" Vector__XXX
+ SG_ Temperature : 24|8@1- (1,0) [-40|105] "degC" Vector__XXX
+ SG_ Peak1s : 32|16@1+ (0.25,0) [0|16383.75] "mg" Vector__XXX
+ SG_ FifoOverruns : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ StatusFlags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 640 VIB_Data_09: 8 VIB_09
+ SG_ RmsX : 0|16@1+ (0.25,0) [0|16383.75] "mg" Vector__XXX
+ SG_ RmsY : 16|16@1+ (0.25,0) [0|16383.75] "mg" Vector__XXX
+ SG_ RmsZ : 32|16@1+ (0.25,0) [0|16383.75] "mg" Vector__XXX
+ SG_ Counter : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 641 VIB_Status_09: 8 VIB_09
+ SG_ NodeId : 0|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ FwVersion : 8|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ FullScale : 16|8@1+ (1,0) [0|16] "g" Vector__XXX
+ SG_ Temperature : 24|8@1- (1,0) [-40|105] "degC" Vector__XXX
+ SG_ Peak1s : 32|16@1+ (0.25,0) [0|16383.75] "mg" Vector__XXX
+ SG_ FifoOverruns : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ StatusFlags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 656 VIB_Data_10: 8 VIB_10
+ SG_ RmsX : 0|16@1+ (0.25,0) [0|16383.75] "mg" Vector__XXX
+ SG_ RmsY : 16|16@1+ (0.25,0) [0|16383.75] "mg" Vector__XXX
+ SG_ RmsZ : 32|16@1+ (0.25,0) [0|16383.75] "mg" Vector__XXX
+ SG_ Counter : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 657 VIB_Status_10: 8 VIB_10
+ SG_ NodeId : 0|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ FwVersion : 8|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ FullScale : 16|8@1+ (1,0) [0|16] "g" Vector__XXX
+ SG_ Temperature : 24|8@1- (1,0) [-40|105] "degC" Vector__XXX
+ SG_ Peak1s : 32|16@1+ (0.25,0) [0|16383.75] "mg" Vector__XXX
+ SG_ FifoOverruns : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ StatusFlags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+
+BO_ 768 ANG_Data_01: 8 ANG_01
+ SG_ Roll : 0|16@1- (0.01,0) [-180|180] "deg" Vector__XXX
+ SG_ Pitch : 16|16@1- (0.01,0) [-90|90] "deg" Vector__XXX
+ SG_ Yaw : 32|16@1- (0.01,0) [-180|180] "deg" Vector__XXX
+ SG_ Counter : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 769 ANG_Accel_01: 8 ANG_01
+ SG_ AccX : 0|16@1- (0.001,0) [-32.767|32.767] "g" Vector__XXX
+ SG_ AccY : 16|16@1- (0.001,0) [-32.767|32.767] "g" Vector__XXX
+ SG_ AccZ : 32|16@1- (0.001,0) [-32.767|32.767] "g" Vector__XXX
+ SG_ Counter : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 770 ANG_Status_01: 8 ANG_01
+ SG_ NodeId : 0|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ FwVersion : 8|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ AccelFsCode : 16|4@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ GyroFsCode : 20|4@1+ (1,0) [0|5] "" Vector__XXX
+ SG_ Temperature : 24|8@1- (1,0) [-40|105] "degC" Vector__XXX
+ SG_ SecondsSinceZero : 32|16@1+ (1,0) [0|65535] "s" Vector__XXX
+ SG_ CmdSeq : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ StatusFlags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 771 ANG_Rate_01: 8 ANG_01
+ SG_ RateX : 0|16@1- (0.125,0) [-4095.875|4095.875] "dps" Vector__XXX
+ SG_ RateY : 16|16@1- (0.125,0) [-4095.875|4095.875] "dps" Vector__XXX
+ SG_ RateZ : 32|16@1- (0.125,0) [-4095.875|4095.875] "dps" Vector__XXX
+ SG_ Counter : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 48 ANG_Cmd_01: 8 VF_Main
+ SG_ Cmd : 0|8@1+ (1,0) [0|255] "" ANG_01
+ SG_ Seq : 8|8@1+ (1,0) [0|255] "" ANG_01
+ SG_ Arg0 : 16|8@1+ (1,0) [0|255] "" ANG_01
+ SG_ Arg1 : 24|8@1+ (1,0) [0|255] "" ANG_01
+ SG_ Arg2 : 32|8@1+ (1,0) [0|255] "" ANG_01
+ SG_ Arg3 : 40|8@1+ (1,0) [0|255] "" ANG_01
+ SG_ Magic0 : 48|8@1+ (1,0) [0|255] "" ANG_01
+ SG_ Magic1 : 56|8@1+ (1,0) [0|255] "" ANG_01
+
+BO_ 784 ANG_Data_02: 8 ANG_02
+ SG_ Roll : 0|16@1- (0.01,0) [-180|180] "deg" Vector__XXX
+ SG_ Pitch : 16|16@1- (0.01,0) [-90|90] "deg" Vector__XXX
+ SG_ Yaw : 32|16@1- (0.01,0) [-180|180] "deg" Vector__XXX
+ SG_ Counter : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 785 ANG_Accel_02: 8 ANG_02
+ SG_ AccX : 0|16@1- (0.001,0) [-32.767|32.767] "g" Vector__XXX
+ SG_ AccY : 16|16@1- (0.001,0) [-32.767|32.767] "g" Vector__XXX
+ SG_ AccZ : 32|16@1- (0.001,0) [-32.767|32.767] "g" Vector__XXX
+ SG_ Counter : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 786 ANG_Status_02: 8 ANG_02
+ SG_ NodeId : 0|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ FwVersion : 8|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ AccelFsCode : 16|4@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ GyroFsCode : 20|4@1+ (1,0) [0|5] "" Vector__XXX
+ SG_ Temperature : 24|8@1- (1,0) [-40|105] "degC" Vector__XXX
+ SG_ SecondsSinceZero : 32|16@1+ (1,0) [0|65535] "s" Vector__XXX
+ SG_ CmdSeq : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ StatusFlags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 787 ANG_Rate_02: 8 ANG_02
+ SG_ RateX : 0|16@1- (0.125,0) [-4095.875|4095.875] "dps" Vector__XXX
+ SG_ RateY : 16|16@1- (0.125,0) [-4095.875|4095.875] "dps" Vector__XXX
+ SG_ RateZ : 32|16@1- (0.125,0) [-4095.875|4095.875] "dps" Vector__XXX
+ SG_ Counter : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 49 ANG_Cmd_02: 8 VF_Main
+ SG_ Cmd : 0|8@1+ (1,0) [0|255] "" ANG_02
+ SG_ Seq : 8|8@1+ (1,0) [0|255] "" ANG_02
+ SG_ Arg0 : 16|8@1+ (1,0) [0|255] "" ANG_02
+ SG_ Arg1 : 24|8@1+ (1,0) [0|255] "" ANG_02
+ SG_ Arg2 : 32|8@1+ (1,0) [0|255] "" ANG_02
+ SG_ Arg3 : 40|8@1+ (1,0) [0|255] "" ANG_02
+ SG_ Magic0 : 48|8@1+ (1,0) [0|255] "" ANG_02
+ SG_ Magic1 : 56|8@1+ (1,0) [0|255] "" ANG_02
+
+BO_ 800 ANG_Data_03: 8 ANG_03
+ SG_ Roll : 0|16@1- (0.01,0) [-180|180] "deg" Vector__XXX
+ SG_ Pitch : 16|16@1- (0.01,0) [-90|90] "deg" Vector__XXX
+ SG_ Yaw : 32|16@1- (0.01,0) [-180|180] "deg" Vector__XXX
+ SG_ Counter : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 801 ANG_Accel_03: 8 ANG_03
+ SG_ AccX : 0|16@1- (0.001,0) [-32.767|32.767] "g" Vector__XXX
+ SG_ AccY : 16|16@1- (0.001,0) [-32.767|32.767] "g" Vector__XXX
+ SG_ AccZ : 32|16@1- (0.001,0) [-32.767|32.767] "g" Vector__XXX
+ SG_ Counter : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 802 ANG_Status_03: 8 ANG_03
+ SG_ NodeId : 0|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ FwVersion : 8|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ AccelFsCode : 16|4@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ GyroFsCode : 20|4@1+ (1,0) [0|5] "" Vector__XXX
+ SG_ Temperature : 24|8@1- (1,0) [-40|105] "degC" Vector__XXX
+ SG_ SecondsSinceZero : 32|16@1+ (1,0) [0|65535] "s" Vector__XXX
+ SG_ CmdSeq : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ StatusFlags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 803 ANG_Rate_03: 8 ANG_03
+ SG_ RateX : 0|16@1- (0.125,0) [-4095.875|4095.875] "dps" Vector__XXX
+ SG_ RateY : 16|16@1- (0.125,0) [-4095.875|4095.875] "dps" Vector__XXX
+ SG_ RateZ : 32|16@1- (0.125,0) [-4095.875|4095.875] "dps" Vector__XXX
+ SG_ Counter : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 50 ANG_Cmd_03: 8 VF_Main
+ SG_ Cmd : 0|8@1+ (1,0) [0|255] "" ANG_03
+ SG_ Seq : 8|8@1+ (1,0) [0|255] "" ANG_03
+ SG_ Arg0 : 16|8@1+ (1,0) [0|255] "" ANG_03
+ SG_ Arg1 : 24|8@1+ (1,0) [0|255] "" ANG_03
+ SG_ Arg2 : 32|8@1+ (1,0) [0|255] "" ANG_03
+ SG_ Arg3 : 40|8@1+ (1,0) [0|255] "" ANG_03
+ SG_ Magic0 : 48|8@1+ (1,0) [0|255] "" ANG_03
+ SG_ Magic1 : 56|8@1+ (1,0) [0|255] "" ANG_03
+
+BO_ 816 ANG_Data_04: 8 ANG_04
+ SG_ Roll : 0|16@1- (0.01,0) [-180|180] "deg" Vector__XXX
+ SG_ Pitch : 16|16@1- (0.01,0) [-90|90] "deg" Vector__XXX
+ SG_ Yaw : 32|16@1- (0.01,0) [-180|180] "deg" Vector__XXX
+ SG_ Counter : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 817 ANG_Accel_04: 8 ANG_04
+ SG_ AccX : 0|16@1- (0.001,0) [-32.767|32.767] "g" Vector__XXX
+ SG_ AccY : 16|16@1- (0.001,0) [-32.767|32.767] "g" Vector__XXX
+ SG_ AccZ : 32|16@1- (0.001,0) [-32.767|32.767] "g" Vector__XXX
+ SG_ Counter : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 818 ANG_Status_04: 8 ANG_04
+ SG_ NodeId : 0|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ FwVersion : 8|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ AccelFsCode : 16|4@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ GyroFsCode : 20|4@1+ (1,0) [0|5] "" Vector__XXX
+ SG_ Temperature : 24|8@1- (1,0) [-40|105] "degC" Vector__XXX
+ SG_ SecondsSinceZero : 32|16@1+ (1,0) [0|65535] "s" Vector__XXX
+ SG_ CmdSeq : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ StatusFlags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 819 ANG_Rate_04: 8 ANG_04
+ SG_ RateX : 0|16@1- (0.125,0) [-4095.875|4095.875] "dps" Vector__XXX
+ SG_ RateY : 16|16@1- (0.125,0) [-4095.875|4095.875] "dps" Vector__XXX
+ SG_ RateZ : 32|16@1- (0.125,0) [-4095.875|4095.875] "dps" Vector__XXX
+ SG_ Counter : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 51 ANG_Cmd_04: 8 VF_Main
+ SG_ Cmd : 0|8@1+ (1,0) [0|255] "" ANG_04
+ SG_ Seq : 8|8@1+ (1,0) [0|255] "" ANG_04
+ SG_ Arg0 : 16|8@1+ (1,0) [0|255] "" ANG_04
+ SG_ Arg1 : 24|8@1+ (1,0) [0|255] "" ANG_04
+ SG_ Arg2 : 32|8@1+ (1,0) [0|255] "" ANG_04
+ SG_ Arg3 : 40|8@1+ (1,0) [0|255] "" ANG_04
+ SG_ Magic0 : 48|8@1+ (1,0) [0|255] "" ANG_04
+ SG_ Magic1 : 56|8@1+ (1,0) [0|255] "" ANG_04
+
+BO_ 832 ANG_Data_05: 8 ANG_05
+ SG_ Roll : 0|16@1- (0.01,0) [-180|180] "deg" Vector__XXX
+ SG_ Pitch : 16|16@1- (0.01,0) [-90|90] "deg" Vector__XXX
+ SG_ Yaw : 32|16@1- (0.01,0) [-180|180] "deg" Vector__XXX
+ SG_ Counter : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 833 ANG_Accel_05: 8 ANG_05
+ SG_ AccX : 0|16@1- (0.001,0) [-32.767|32.767] "g" Vector__XXX
+ SG_ AccY : 16|16@1- (0.001,0) [-32.767|32.767] "g" Vector__XXX
+ SG_ AccZ : 32|16@1- (0.001,0) [-32.767|32.767] "g" Vector__XXX
+ SG_ Counter : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 834 ANG_Status_05: 8 ANG_05
+ SG_ NodeId : 0|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ FwVersion : 8|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ AccelFsCode : 16|4@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ GyroFsCode : 20|4@1+ (1,0) [0|5] "" Vector__XXX
+ SG_ Temperature : 24|8@1- (1,0) [-40|105] "degC" Vector__XXX
+ SG_ SecondsSinceZero : 32|16@1+ (1,0) [0|65535] "s" Vector__XXX
+ SG_ CmdSeq : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ StatusFlags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 835 ANG_Rate_05: 8 ANG_05
+ SG_ RateX : 0|16@1- (0.125,0) [-4095.875|4095.875] "dps" Vector__XXX
+ SG_ RateY : 16|16@1- (0.125,0) [-4095.875|4095.875] "dps" Vector__XXX
+ SG_ RateZ : 32|16@1- (0.125,0) [-4095.875|4095.875] "dps" Vector__XXX
+ SG_ Counter : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 52 ANG_Cmd_05: 8 VF_Main
+ SG_ Cmd : 0|8@1+ (1,0) [0|255] "" ANG_05
+ SG_ Seq : 8|8@1+ (1,0) [0|255] "" ANG_05
+ SG_ Arg0 : 16|8@1+ (1,0) [0|255] "" ANG_05
+ SG_ Arg1 : 24|8@1+ (1,0) [0|255] "" ANG_05
+ SG_ Arg2 : 32|8@1+ (1,0) [0|255] "" ANG_05
+ SG_ Arg3 : 40|8@1+ (1,0) [0|255] "" ANG_05
+ SG_ Magic0 : 48|8@1+ (1,0) [0|255] "" ANG_05
+ SG_ Magic1 : 56|8@1+ (1,0) [0|255] "" ANG_05
+
+BO_ 848 ANG_Data_06: 8 ANG_06
+ SG_ Roll : 0|16@1- (0.01,0) [-180|180] "deg" Vector__XXX
+ SG_ Pitch : 16|16@1- (0.01,0) [-90|90] "deg" Vector__XXX
+ SG_ Yaw : 32|16@1- (0.01,0) [-180|180] "deg" Vector__XXX
+ SG_ Counter : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 849 ANG_Accel_06: 8 ANG_06
+ SG_ AccX : 0|16@1- (0.001,0) [-32.767|32.767] "g" Vector__XXX
+ SG_ AccY : 16|16@1- (0.001,0) [-32.767|32.767] "g" Vector__XXX
+ SG_ AccZ : 32|16@1- (0.001,0) [-32.767|32.767] "g" Vector__XXX
+ SG_ Counter : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 850 ANG_Status_06: 8 ANG_06
+ SG_ NodeId : 0|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ FwVersion : 8|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ AccelFsCode : 16|4@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ GyroFsCode : 20|4@1+ (1,0) [0|5] "" Vector__XXX
+ SG_ Temperature : 24|8@1- (1,0) [-40|105] "degC" Vector__XXX
+ SG_ SecondsSinceZero : 32|16@1+ (1,0) [0|65535] "s" Vector__XXX
+ SG_ CmdSeq : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ StatusFlags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 851 ANG_Rate_06: 8 ANG_06
+ SG_ RateX : 0|16@1- (0.125,0) [-4095.875|4095.875] "dps" Vector__XXX
+ SG_ RateY : 16|16@1- (0.125,0) [-4095.875|4095.875] "dps" Vector__XXX
+ SG_ RateZ : 32|16@1- (0.125,0) [-4095.875|4095.875] "dps" Vector__XXX
+ SG_ Counter : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 53 ANG_Cmd_06: 8 VF_Main
+ SG_ Cmd : 0|8@1+ (1,0) [0|255] "" ANG_06
+ SG_ Seq : 8|8@1+ (1,0) [0|255] "" ANG_06
+ SG_ Arg0 : 16|8@1+ (1,0) [0|255] "" ANG_06
+ SG_ Arg1 : 24|8@1+ (1,0) [0|255] "" ANG_06
+ SG_ Arg2 : 32|8@1+ (1,0) [0|255] "" ANG_06
+ SG_ Arg3 : 40|8@1+ (1,0) [0|255] "" ANG_06
+ SG_ Magic0 : 48|8@1+ (1,0) [0|255] "" ANG_06
+ SG_ Magic1 : 56|8@1+ (1,0) [0|255] "" ANG_06
+
+BO_ 864 ANG_Data_07: 8 ANG_07
+ SG_ Roll : 0|16@1- (0.01,0) [-180|180] "deg" Vector__XXX
+ SG_ Pitch : 16|16@1- (0.01,0) [-90|90] "deg" Vector__XXX
+ SG_ Yaw : 32|16@1- (0.01,0) [-180|180] "deg" Vector__XXX
+ SG_ Counter : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 865 ANG_Accel_07: 8 ANG_07
+ SG_ AccX : 0|16@1- (0.001,0) [-32.767|32.767] "g" Vector__XXX
+ SG_ AccY : 16|16@1- (0.001,0) [-32.767|32.767] "g" Vector__XXX
+ SG_ AccZ : 32|16@1- (0.001,0) [-32.767|32.767] "g" Vector__XXX
+ SG_ Counter : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 866 ANG_Status_07: 8 ANG_07
+ SG_ NodeId : 0|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ FwVersion : 8|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ AccelFsCode : 16|4@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ GyroFsCode : 20|4@1+ (1,0) [0|5] "" Vector__XXX
+ SG_ Temperature : 24|8@1- (1,0) [-40|105] "degC" Vector__XXX
+ SG_ SecondsSinceZero : 32|16@1+ (1,0) [0|65535] "s" Vector__XXX
+ SG_ CmdSeq : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ StatusFlags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 867 ANG_Rate_07: 8 ANG_07
+ SG_ RateX : 0|16@1- (0.125,0) [-4095.875|4095.875] "dps" Vector__XXX
+ SG_ RateY : 16|16@1- (0.125,0) [-4095.875|4095.875] "dps" Vector__XXX
+ SG_ RateZ : 32|16@1- (0.125,0) [-4095.875|4095.875] "dps" Vector__XXX
+ SG_ Counter : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 54 ANG_Cmd_07: 8 VF_Main
+ SG_ Cmd : 0|8@1+ (1,0) [0|255] "" ANG_07
+ SG_ Seq : 8|8@1+ (1,0) [0|255] "" ANG_07
+ SG_ Arg0 : 16|8@1+ (1,0) [0|255] "" ANG_07
+ SG_ Arg1 : 24|8@1+ (1,0) [0|255] "" ANG_07
+ SG_ Arg2 : 32|8@1+ (1,0) [0|255] "" ANG_07
+ SG_ Arg3 : 40|8@1+ (1,0) [0|255] "" ANG_07
+ SG_ Magic0 : 48|8@1+ (1,0) [0|255] "" ANG_07
+ SG_ Magic1 : 56|8@1+ (1,0) [0|255] "" ANG_07
+
+BO_ 880 ANG_Data_08: 8 ANG_08
+ SG_ Roll : 0|16@1- (0.01,0) [-180|180] "deg" Vector__XXX
+ SG_ Pitch : 16|16@1- (0.01,0) [-90|90] "deg" Vector__XXX
+ SG_ Yaw : 32|16@1- (0.01,0) [-180|180] "deg" Vector__XXX
+ SG_ Counter : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 881 ANG_Accel_08: 8 ANG_08
+ SG_ AccX : 0|16@1- (0.001,0) [-32.767|32.767] "g" Vector__XXX
+ SG_ AccY : 16|16@1- (0.001,0) [-32.767|32.767] "g" Vector__XXX
+ SG_ AccZ : 32|16@1- (0.001,0) [-32.767|32.767] "g" Vector__XXX
+ SG_ Counter : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 882 ANG_Status_08: 8 ANG_08
+ SG_ NodeId : 0|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ FwVersion : 8|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ AccelFsCode : 16|4@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ GyroFsCode : 20|4@1+ (1,0) [0|5] "" Vector__XXX
+ SG_ Temperature : 24|8@1- (1,0) [-40|105] "degC" Vector__XXX
+ SG_ SecondsSinceZero : 32|16@1+ (1,0) [0|65535] "s" Vector__XXX
+ SG_ CmdSeq : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ StatusFlags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 883 ANG_Rate_08: 8 ANG_08
+ SG_ RateX : 0|16@1- (0.125,0) [-4095.875|4095.875] "dps" Vector__XXX
+ SG_ RateY : 16|16@1- (0.125,0) [-4095.875|4095.875] "dps" Vector__XXX
+ SG_ RateZ : 32|16@1- (0.125,0) [-4095.875|4095.875] "dps" Vector__XXX
+ SG_ Counter : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 55 ANG_Cmd_08: 8 VF_Main
+ SG_ Cmd : 0|8@1+ (1,0) [0|255] "" ANG_08
+ SG_ Seq : 8|8@1+ (1,0) [0|255] "" ANG_08
+ SG_ Arg0 : 16|8@1+ (1,0) [0|255] "" ANG_08
+ SG_ Arg1 : 24|8@1+ (1,0) [0|255] "" ANG_08
+ SG_ Arg2 : 32|8@1+ (1,0) [0|255] "" ANG_08
+ SG_ Arg3 : 40|8@1+ (1,0) [0|255] "" ANG_08
+ SG_ Magic0 : 48|8@1+ (1,0) [0|255] "" ANG_08
+ SG_ Magic1 : 56|8@1+ (1,0) [0|255] "" ANG_08
+
+BO_ 896 ANG_Data_09: 8 ANG_09
+ SG_ Roll : 0|16@1- (0.01,0) [-180|180] "deg" Vector__XXX
+ SG_ Pitch : 16|16@1- (0.01,0) [-90|90] "deg" Vector__XXX
+ SG_ Yaw : 32|16@1- (0.01,0) [-180|180] "deg" Vector__XXX
+ SG_ Counter : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 897 ANG_Accel_09: 8 ANG_09
+ SG_ AccX : 0|16@1- (0.001,0) [-32.767|32.767] "g" Vector__XXX
+ SG_ AccY : 16|16@1- (0.001,0) [-32.767|32.767] "g" Vector__XXX
+ SG_ AccZ : 32|16@1- (0.001,0) [-32.767|32.767] "g" Vector__XXX
+ SG_ Counter : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 898 ANG_Status_09: 8 ANG_09
+ SG_ NodeId : 0|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ FwVersion : 8|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ AccelFsCode : 16|4@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ GyroFsCode : 20|4@1+ (1,0) [0|5] "" Vector__XXX
+ SG_ Temperature : 24|8@1- (1,0) [-40|105] "degC" Vector__XXX
+ SG_ SecondsSinceZero : 32|16@1+ (1,0) [0|65535] "s" Vector__XXX
+ SG_ CmdSeq : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ StatusFlags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 899 ANG_Rate_09: 8 ANG_09
+ SG_ RateX : 0|16@1- (0.125,0) [-4095.875|4095.875] "dps" Vector__XXX
+ SG_ RateY : 16|16@1- (0.125,0) [-4095.875|4095.875] "dps" Vector__XXX
+ SG_ RateZ : 32|16@1- (0.125,0) [-4095.875|4095.875] "dps" Vector__XXX
+ SG_ Counter : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 56 ANG_Cmd_09: 8 VF_Main
+ SG_ Cmd : 0|8@1+ (1,0) [0|255] "" ANG_09
+ SG_ Seq : 8|8@1+ (1,0) [0|255] "" ANG_09
+ SG_ Arg0 : 16|8@1+ (1,0) [0|255] "" ANG_09
+ SG_ Arg1 : 24|8@1+ (1,0) [0|255] "" ANG_09
+ SG_ Arg2 : 32|8@1+ (1,0) [0|255] "" ANG_09
+ SG_ Arg3 : 40|8@1+ (1,0) [0|255] "" ANG_09
+ SG_ Magic0 : 48|8@1+ (1,0) [0|255] "" ANG_09
+ SG_ Magic1 : 56|8@1+ (1,0) [0|255] "" ANG_09
+
+BO_ 912 ANG_Data_10: 8 ANG_10
+ SG_ Roll : 0|16@1- (0.01,0) [-180|180] "deg" Vector__XXX
+ SG_ Pitch : 16|16@1- (0.01,0) [-90|90] "deg" Vector__XXX
+ SG_ Yaw : 32|16@1- (0.01,0) [-180|180] "deg" Vector__XXX
+ SG_ Counter : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 913 ANG_Accel_10: 8 ANG_10
+ SG_ AccX : 0|16@1- (0.001,0) [-32.767|32.767] "g" Vector__XXX
+ SG_ AccY : 16|16@1- (0.001,0) [-32.767|32.767] "g" Vector__XXX
+ SG_ AccZ : 32|16@1- (0.001,0) [-32.767|32.767] "g" Vector__XXX
+ SG_ Counter : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 914 ANG_Status_10: 8 ANG_10
+ SG_ NodeId : 0|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ FwVersion : 8|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ AccelFsCode : 16|4@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ GyroFsCode : 20|4@1+ (1,0) [0|5] "" Vector__XXX
+ SG_ Temperature : 24|8@1- (1,0) [-40|105] "degC" Vector__XXX
+ SG_ SecondsSinceZero : 32|16@1+ (1,0) [0|65535] "s" Vector__XXX
+ SG_ CmdSeq : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ StatusFlags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 915 ANG_Rate_10: 8 ANG_10
+ SG_ RateX : 0|16@1- (0.125,0) [-4095.875|4095.875] "dps" Vector__XXX
+ SG_ RateY : 16|16@1- (0.125,0) [-4095.875|4095.875] "dps" Vector__XXX
+ SG_ RateZ : 32|16@1- (0.125,0) [-4095.875|4095.875] "dps" Vector__XXX
+ SG_ Counter : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 57 ANG_Cmd_10: 8 VF_Main
+ SG_ Cmd : 0|8@1+ (1,0) [0|255] "" ANG_10
+ SG_ Seq : 8|8@1+ (1,0) [0|255] "" ANG_10
+ SG_ Arg0 : 16|8@1+ (1,0) [0|255] "" ANG_10
+ SG_ Arg1 : 24|8@1+ (1,0) [0|255] "" ANG_10
+ SG_ Arg2 : 32|8@1+ (1,0) [0|255] "" ANG_10
+ SG_ Arg3 : 40|8@1+ (1,0) [0|255] "" ANG_10
+ SG_ Magic0 : 48|8@1+ (1,0) [0|255] "" ANG_10
+ SG_ Magic1 : 56|8@1+ (1,0) [0|255] "" ANG_10
+
+BO_ 1024 TH_Data_01: 8 TH_01
+ SG_ Temperature : 0|16@1- (0.1,0) [-40|60] "degC" Vector__XXX
+ SG_ Humidity : 16|16@1+ (0.1,0) [0|100] "%RH" Vector__XXX
+ SG_ DataAge : 32|16@1+ (0.1,0) [0|6553.5] "s" Vector__XXX
+ SG_ Counter : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 1026 TH_Status_01: 8 TH_01
+ SG_ FwVersion : 0|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ StatusFlags : 8|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ NodeId : 16|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ TxPeriod : 24|8@1+ (10,0) [0|2550] "ms" Vector__XXX
+ SG_ ModbusOk : 32|16@1+ (1,0) [0|65535] "" Vector__XXX
+ SG_ ModbusErr : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ CmdSeq : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 64 TH_Cmd_01: 8 VF_Main
+ SG_ Cmd : 0|8@1+ (1,0) [0|255] "" TH_01
+ SG_ Seq : 8|8@1+ (1,0) [0|255] "" TH_01
+ SG_ Arg0 : 16|8@1+ (1,0) [0|255] "" TH_01
+ SG_ Arg1 : 24|8@1+ (1,0) [0|255] "" TH_01
+ SG_ Arg2 : 32|8@1+ (1,0) [0|255] "" TH_01
+ SG_ Arg3 : 40|8@1+ (1,0) [0|255] "" TH_01
+ SG_ Magic0 : 48|8@1+ (1,0) [0|255] "" TH_01
+ SG_ Magic1 : 56|8@1+ (1,0) [0|255] "" TH_01
+
+BO_ 1040 TH_Data_02: 8 TH_02
+ SG_ Temperature : 0|16@1- (0.1,0) [-40|60] "degC" Vector__XXX
+ SG_ Humidity : 16|16@1+ (0.1,0) [0|100] "%RH" Vector__XXX
+ SG_ DataAge : 32|16@1+ (0.1,0) [0|6553.5] "s" Vector__XXX
+ SG_ Counter : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 1042 TH_Status_02: 8 TH_02
+ SG_ FwVersion : 0|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ StatusFlags : 8|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ NodeId : 16|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ TxPeriod : 24|8@1+ (10,0) [0|2550] "ms" Vector__XXX
+ SG_ ModbusOk : 32|16@1+ (1,0) [0|65535] "" Vector__XXX
+ SG_ ModbusErr : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ CmdSeq : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 65 TH_Cmd_02: 8 VF_Main
+ SG_ Cmd : 0|8@1+ (1,0) [0|255] "" TH_02
+ SG_ Seq : 8|8@1+ (1,0) [0|255] "" TH_02
+ SG_ Arg0 : 16|8@1+ (1,0) [0|255] "" TH_02
+ SG_ Arg1 : 24|8@1+ (1,0) [0|255] "" TH_02
+ SG_ Arg2 : 32|8@1+ (1,0) [0|255] "" TH_02
+ SG_ Arg3 : 40|8@1+ (1,0) [0|255] "" TH_02
+ SG_ Magic0 : 48|8@1+ (1,0) [0|255] "" TH_02
+ SG_ Magic1 : 56|8@1+ (1,0) [0|255] "" TH_02
+
+BO_ 1056 TH_Data_03: 8 TH_03
+ SG_ Temperature : 0|16@1- (0.1,0) [-40|60] "degC" Vector__XXX
+ SG_ Humidity : 16|16@1+ (0.1,0) [0|100] "%RH" Vector__XXX
+ SG_ DataAge : 32|16@1+ (0.1,0) [0|6553.5] "s" Vector__XXX
+ SG_ Counter : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 1058 TH_Status_03: 8 TH_03
+ SG_ FwVersion : 0|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ StatusFlags : 8|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ NodeId : 16|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ TxPeriod : 24|8@1+ (10,0) [0|2550] "ms" Vector__XXX
+ SG_ ModbusOk : 32|16@1+ (1,0) [0|65535] "" Vector__XXX
+ SG_ ModbusErr : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ CmdSeq : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 66 TH_Cmd_03: 8 VF_Main
+ SG_ Cmd : 0|8@1+ (1,0) [0|255] "" TH_03
+ SG_ Seq : 8|8@1+ (1,0) [0|255] "" TH_03
+ SG_ Arg0 : 16|8@1+ (1,0) [0|255] "" TH_03
+ SG_ Arg1 : 24|8@1+ (1,0) [0|255] "" TH_03
+ SG_ Arg2 : 32|8@1+ (1,0) [0|255] "" TH_03
+ SG_ Arg3 : 40|8@1+ (1,0) [0|255] "" TH_03
+ SG_ Magic0 : 48|8@1+ (1,0) [0|255] "" TH_03
+ SG_ Magic1 : 56|8@1+ (1,0) [0|255] "" TH_03
+
+BO_ 1072 TH_Data_04: 8 TH_04
+ SG_ Temperature : 0|16@1- (0.1,0) [-40|60] "degC" Vector__XXX
+ SG_ Humidity : 16|16@1+ (0.1,0) [0|100] "%RH" Vector__XXX
+ SG_ DataAge : 32|16@1+ (0.1,0) [0|6553.5] "s" Vector__XXX
+ SG_ Counter : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 1074 TH_Status_04: 8 TH_04
+ SG_ FwVersion : 0|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ StatusFlags : 8|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ NodeId : 16|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ TxPeriod : 24|8@1+ (10,0) [0|2550] "ms" Vector__XXX
+ SG_ ModbusOk : 32|16@1+ (1,0) [0|65535] "" Vector__XXX
+ SG_ ModbusErr : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ CmdSeq : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 67 TH_Cmd_04: 8 VF_Main
+ SG_ Cmd : 0|8@1+ (1,0) [0|255] "" TH_04
+ SG_ Seq : 8|8@1+ (1,0) [0|255] "" TH_04
+ SG_ Arg0 : 16|8@1+ (1,0) [0|255] "" TH_04
+ SG_ Arg1 : 24|8@1+ (1,0) [0|255] "" TH_04
+ SG_ Arg2 : 32|8@1+ (1,0) [0|255] "" TH_04
+ SG_ Arg3 : 40|8@1+ (1,0) [0|255] "" TH_04
+ SG_ Magic0 : 48|8@1+ (1,0) [0|255] "" TH_04
+ SG_ Magic1 : 56|8@1+ (1,0) [0|255] "" TH_04
+
+BO_ 1088 TH_Data_05: 8 TH_05
+ SG_ Temperature : 0|16@1- (0.1,0) [-40|60] "degC" Vector__XXX
+ SG_ Humidity : 16|16@1+ (0.1,0) [0|100] "%RH" Vector__XXX
+ SG_ DataAge : 32|16@1+ (0.1,0) [0|6553.5] "s" Vector__XXX
+ SG_ Counter : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 1090 TH_Status_05: 8 TH_05
+ SG_ FwVersion : 0|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ StatusFlags : 8|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ NodeId : 16|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ TxPeriod : 24|8@1+ (10,0) [0|2550] "ms" Vector__XXX
+ SG_ ModbusOk : 32|16@1+ (1,0) [0|65535] "" Vector__XXX
+ SG_ ModbusErr : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ CmdSeq : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 68 TH_Cmd_05: 8 VF_Main
+ SG_ Cmd : 0|8@1+ (1,0) [0|255] "" TH_05
+ SG_ Seq : 8|8@1+ (1,0) [0|255] "" TH_05
+ SG_ Arg0 : 16|8@1+ (1,0) [0|255] "" TH_05
+ SG_ Arg1 : 24|8@1+ (1,0) [0|255] "" TH_05
+ SG_ Arg2 : 32|8@1+ (1,0) [0|255] "" TH_05
+ SG_ Arg3 : 40|8@1+ (1,0) [0|255] "" TH_05
+ SG_ Magic0 : 48|8@1+ (1,0) [0|255] "" TH_05
+ SG_ Magic1 : 56|8@1+ (1,0) [0|255] "" TH_05
+
+BO_ 1104 TH_Data_06: 8 TH_06
+ SG_ Temperature : 0|16@1- (0.1,0) [-40|60] "degC" Vector__XXX
+ SG_ Humidity : 16|16@1+ (0.1,0) [0|100] "%RH" Vector__XXX
+ SG_ DataAge : 32|16@1+ (0.1,0) [0|6553.5] "s" Vector__XXX
+ SG_ Counter : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 1106 TH_Status_06: 8 TH_06
+ SG_ FwVersion : 0|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ StatusFlags : 8|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ NodeId : 16|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ TxPeriod : 24|8@1+ (10,0) [0|2550] "ms" Vector__XXX
+ SG_ ModbusOk : 32|16@1+ (1,0) [0|65535] "" Vector__XXX
+ SG_ ModbusErr : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ CmdSeq : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 69 TH_Cmd_06: 8 VF_Main
+ SG_ Cmd : 0|8@1+ (1,0) [0|255] "" TH_06
+ SG_ Seq : 8|8@1+ (1,0) [0|255] "" TH_06
+ SG_ Arg0 : 16|8@1+ (1,0) [0|255] "" TH_06
+ SG_ Arg1 : 24|8@1+ (1,0) [0|255] "" TH_06
+ SG_ Arg2 : 32|8@1+ (1,0) [0|255] "" TH_06
+ SG_ Arg3 : 40|8@1+ (1,0) [0|255] "" TH_06
+ SG_ Magic0 : 48|8@1+ (1,0) [0|255] "" TH_06
+ SG_ Magic1 : 56|8@1+ (1,0) [0|255] "" TH_06
+
+BO_ 1120 TH_Data_07: 8 TH_07
+ SG_ Temperature : 0|16@1- (0.1,0) [-40|60] "degC" Vector__XXX
+ SG_ Humidity : 16|16@1+ (0.1,0) [0|100] "%RH" Vector__XXX
+ SG_ DataAge : 32|16@1+ (0.1,0) [0|6553.5] "s" Vector__XXX
+ SG_ Counter : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 1122 TH_Status_07: 8 TH_07
+ SG_ FwVersion : 0|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ StatusFlags : 8|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ NodeId : 16|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ TxPeriod : 24|8@1+ (10,0) [0|2550] "ms" Vector__XXX
+ SG_ ModbusOk : 32|16@1+ (1,0) [0|65535] "" Vector__XXX
+ SG_ ModbusErr : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ CmdSeq : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 70 TH_Cmd_07: 8 VF_Main
+ SG_ Cmd : 0|8@1+ (1,0) [0|255] "" TH_07
+ SG_ Seq : 8|8@1+ (1,0) [0|255] "" TH_07
+ SG_ Arg0 : 16|8@1+ (1,0) [0|255] "" TH_07
+ SG_ Arg1 : 24|8@1+ (1,0) [0|255] "" TH_07
+ SG_ Arg2 : 32|8@1+ (1,0) [0|255] "" TH_07
+ SG_ Arg3 : 40|8@1+ (1,0) [0|255] "" TH_07
+ SG_ Magic0 : 48|8@1+ (1,0) [0|255] "" TH_07
+ SG_ Magic1 : 56|8@1+ (1,0) [0|255] "" TH_07
+
+BO_ 1136 TH_Data_08: 8 TH_08
+ SG_ Temperature : 0|16@1- (0.1,0) [-40|60] "degC" Vector__XXX
+ SG_ Humidity : 16|16@1+ (0.1,0) [0|100] "%RH" Vector__XXX
+ SG_ DataAge : 32|16@1+ (0.1,0) [0|6553.5] "s" Vector__XXX
+ SG_ Counter : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 1138 TH_Status_08: 8 TH_08
+ SG_ FwVersion : 0|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ StatusFlags : 8|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ NodeId : 16|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ TxPeriod : 24|8@1+ (10,0) [0|2550] "ms" Vector__XXX
+ SG_ ModbusOk : 32|16@1+ (1,0) [0|65535] "" Vector__XXX
+ SG_ ModbusErr : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ CmdSeq : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 71 TH_Cmd_08: 8 VF_Main
+ SG_ Cmd : 0|8@1+ (1,0) [0|255] "" TH_08
+ SG_ Seq : 8|8@1+ (1,0) [0|255] "" TH_08
+ SG_ Arg0 : 16|8@1+ (1,0) [0|255] "" TH_08
+ SG_ Arg1 : 24|8@1+ (1,0) [0|255] "" TH_08
+ SG_ Arg2 : 32|8@1+ (1,0) [0|255] "" TH_08
+ SG_ Arg3 : 40|8@1+ (1,0) [0|255] "" TH_08
+ SG_ Magic0 : 48|8@1+ (1,0) [0|255] "" TH_08
+ SG_ Magic1 : 56|8@1+ (1,0) [0|255] "" TH_08
+
+BO_ 1152 TH_Data_09: 8 TH_09
+ SG_ Temperature : 0|16@1- (0.1,0) [-40|60] "degC" Vector__XXX
+ SG_ Humidity : 16|16@1+ (0.1,0) [0|100] "%RH" Vector__XXX
+ SG_ DataAge : 32|16@1+ (0.1,0) [0|6553.5] "s" Vector__XXX
+ SG_ Counter : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 1154 TH_Status_09: 8 TH_09
+ SG_ FwVersion : 0|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ StatusFlags : 8|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ NodeId : 16|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ TxPeriod : 24|8@1+ (10,0) [0|2550] "ms" Vector__XXX
+ SG_ ModbusOk : 32|16@1+ (1,0) [0|65535] "" Vector__XXX
+ SG_ ModbusErr : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ CmdSeq : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 72 TH_Cmd_09: 8 VF_Main
+ SG_ Cmd : 0|8@1+ (1,0) [0|255] "" TH_09
+ SG_ Seq : 8|8@1+ (1,0) [0|255] "" TH_09
+ SG_ Arg0 : 16|8@1+ (1,0) [0|255] "" TH_09
+ SG_ Arg1 : 24|8@1+ (1,0) [0|255] "" TH_09
+ SG_ Arg2 : 32|8@1+ (1,0) [0|255] "" TH_09
+ SG_ Arg3 : 40|8@1+ (1,0) [0|255] "" TH_09
+ SG_ Magic0 : 48|8@1+ (1,0) [0|255] "" TH_09
+ SG_ Magic1 : 56|8@1+ (1,0) [0|255] "" TH_09
+
+BO_ 1168 TH_Data_10: 8 TH_10
+ SG_ Temperature : 0|16@1- (0.1,0) [-40|60] "degC" Vector__XXX
+ SG_ Humidity : 16|16@1+ (0.1,0) [0|100] "%RH" Vector__XXX
+ SG_ DataAge : 32|16@1+ (0.1,0) [0|6553.5] "s" Vector__XXX
+ SG_ Counter : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ Flags : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 1170 TH_Status_10: 8 TH_10
+ SG_ FwVersion : 0|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ StatusFlags : 8|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ NodeId : 16|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ TxPeriod : 24|8@1+ (10,0) [0|2550] "ms" Vector__XXX
+ SG_ ModbusOk : 32|16@1+ (1,0) [0|65535] "" Vector__XXX
+ SG_ ModbusErr : 48|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ CmdSeq : 56|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 73 TH_Cmd_10: 8 VF_Main
+ SG_ Cmd : 0|8@1+ (1,0) [0|255] "" TH_10
+ SG_ Seq : 8|8@1+ (1,0) [0|255] "" TH_10
+ SG_ Arg0 : 16|8@1+ (1,0) [0|255] "" TH_10
+ SG_ Arg1 : 24|8@1+ (1,0) [0|255] "" TH_10
+ SG_ Arg2 : 32|8@1+ (1,0) [0|255] "" TH_10
+ SG_ Arg3 : 40|8@1+ (1,0) [0|255] "" TH_10
+ SG_ Magic0 : 48|8@1+ (1,0) [0|255] "" TH_10
+ SG_ Magic1 : 56|8@1+ (1,0) [0|255] "" TH_10
+
+
+CM_ "VF_Main mainboard. Cac message duoi day do mainboard sinh ra tu UBX-NAV-PVT cua u-blox SAM-M10Q, phat len CAN1 o 5 Hz, va ghi vao .blf voi co huong TX. Chung KHONG den tu mot thiet bi ngoai nao.";
+
+CM_ BO_ 1536 "Vi tri. Khi khong co fix hoac gnssFixOK = 0, Latitude va Longitude deu mang 0x7FFFFFFF = 214.7483647, KHONG phai mot vi do nao tren trai dat va nam ngoai dai [-90|90] cua DBC. Khong bao gio gui 0,0: do la vinh Guinea, mot toa do that ve ra duoc tren moi ban do.";
+CM_ SG_ 1536 Latitude "Vi do WGS84. Nguon: UBX-NAV-PVT offset 28, don vi 1e-7 deg.";
+CM_ SG_ 1536 Longitude "Kinh do WGS84. Nguon: UBX-NAV-PVT offset 24, don vi 1e-7 deg.";
+
+CM_ BO_ 1537 "Do cao va chuyen dong. Khi khong co fix hoac gnssFixOK = 0: Altitude = 0x7FFFFFFF, Speed va Heading = 0xFFFF.";
+CM_ SG_ 1537 Altitude "Cao do tren mean sea level. Nguon: UBX-NAV-PVT offset 36 (hMSL), don vi mm.";
+CM_ SG_ 1537 Speed "Toc do mat dat. Nguon: UBX-NAV-PVT offset 60 (gSpeed) mm/s, doi sang 0.01 km/h. 1 mm/s = 0.0036 km/h.";
+CM_ SG_ 1537 Heading "Huong chuyen dong, 0 den 360 deg. Nguon: UBX-NAV-PVT offset 64 (headMot) 1e-5 deg. KHONG co nghia khi dung yen.";
+
+CM_ BO_ 1538 "Chat luong dinh vi. Doc message nay TRUOC khi tin GPS_Position.";
+CM_ SG_ 1538 HAcc "Sai so ngang uoc luong. 0xFFFF nghia la KHONG BIET, khong phai 655.35 m. Loc bo truoc khi ve do thi.";
+CM_ SG_ 1538 VAcc "Sai so dung uoc luong. 0xFFFF nghia la KHONG BIET, khong phai 655.35 m.";
+CM_ SG_ 1538 PDOP "Position dilution of precision. 0xFFFF nghia la KHONG BIET.";
+CM_ SG_ 1538 NumSV "So ve tinh dung trong loi giai. Bang 0 van co the co thoi gian hop le: may thu giai duoc gio truoc khi giai duoc vi tri.";
+
+CM_ BO_ 1539 "Thoi gian UTC cua epoch dinh vi, lay tu chinh may thu.";
+CM_ SG_ 1539 UnixSeconds "Giay tu 1970-01-01 UTC. Bang 0 khi ValidFlags noi gio chua hop le.";
+CM_ SG_ 1539 Millisecond "Phan le cua giay. Da cong nano_ns co dau, nen epoch roi truoc giay duoc goi ten van dung.";
+CM_ SG_ 1539 ValidFlags "bit0 validDate, bit1 validTime, bit2 fullyResolved, bit3 gnssFixOK. Chi tin gio khi bit0..2 cung bang 1.";
+
+CM_ BO_ 512 "Du lieu rung, mot frame moi 10 ms (mac dinh) hoac 5 ms. Module rung la loai 0x1, nen node_id = 0x10 + (nhan tren vo - 1): module 1 la node 0x10, module 10 la node 0x19. RMS tinh QUANH mot uoc luong DC cham (IIR goc 0.13 Hz), nen trong luc va gia toc cham cua xe da bi loai - day la rung, khong phai gia toc tuyet doi. Khoi nay lap lai cho module 02..10 tai base = 0x100 + node_id*0x10, tuc 0x200..0x290.";
+CM_ SG_ 512 RmsX "RMS truc X trong cua so BANG DUNG chu ky phat: 268 mau (9.999 ms) o 10 ms, 134 mau (4.999 ms) o 5 ms. Cua so khong bao gio chong lan va khong bao gio bo sot mau - moi mau nam trong dung mot cua so, nen ghep cac frame lai la duoc mot chuoi lien tuc. Thang 0.25 mg/dem dung chung cho MOI full scale, nen doi FS khong phai doi DBC.";
+CM_ SG_ 512 RmsY "RMS truc Y. Xem RmsX.";
+CM_ SG_ 512 RmsZ "RMS truc Z. Xem RmsX.";
+CM_ SG_ 512 Counter "Tang 1 moi frame, cuon 0 den 255. Moc thoi gian trong .blf la luc frame LEN DAY, khong phai luc do: o 44% tai bus mot module node_id cao co the bi arbitration day tre toi 2 ms. Dung Counter de dung lai truc thoi gian that va de phat hien frame bi mat.";
+CM_ SG_ 512 Flags "bit0 CLIP: co mau cham full scale trong cua so nay, RMS la uoc luong THAP mot luong khong biet - LOAI cua so nay khoi phan tich, khong hieu chinh. bit1 FIFO_OVR: FIFO cam bien tran ke tu lan bao truoc, co mau da mat. bit2 SETTLING: uoc luong DC chua on dinh (khoang 1.2 s dau). bit3 FAULT: module da chot mot loi va frame nay KHONG phai mot phep do - RMS = 0 o day nghia la khong do duoc, khong phai xe dung yen. Dat boi MOI loi da chot, khong rieng loi cam bien. Doc VIB_Status.StatusFlags va ma nhay LED de biet loi nao. bit4..7 du tru, phai bang 0.";
+CM_ BO_ 513 "Chan doan va kiem ke, 1 Hz. Khoi nay lap lai cho module 02..10 tai base + 1.";
+CM_ SG_ 513 NodeId "Lap lai chinh node_id ma frame ID da mang - CO CHU DINH. Day la cach duy nhat phat hien HAI module bi gan TRUNG node_id: chung se phat cung ID va .blf se co hai VIB_Status mau thuan nhau o cac truong khac. Khong co truong nay thi trung ID chi hien ra nhu du lieu nhieu. Nibble cao cua node_id phai bang module_type (0x1 cho module rung); lech nhau nghia la module bi cau hinh sai loai.";
+CM_ SG_ 513 FullScale "Full scale dang dung, don vi g: 2, 4, 8 hoac 16. KHONG anh huong thang cua RmsX/Y/Z va Peak1s.";
+CM_ SG_ 513 Temperature "Nhiet do cua CHINH con cam bien (IIS3DWB, 256 LSB/degC). Sai so tuyet doi toi +-15 degC neu khong hieu chuan mot diem, nen day la xu huong chu khong phai nhiet ke.";
+CM_ SG_ 513 Peak1s "Max |a| tren ca ba truc trong mot giay, cung goc DC voi RmsX/Y/Z. Crest factor = Peak1s / RMS, tinh o phia PC - hai so phai cung goc thi ty so moi co nghia.";
+CM_ SG_ 513 FifoOverruns "So lan FIFO cam bien tran ke tu khi khoi dong, bao hoa o 255. Khac 0 nghia la da mat mau.";
+CM_ SG_ 513 StatusFlags "Co suc khoe module. bit0 FAULT: module da chot mot loi, LED dang nhay ma. bit1 SELF_TEST_FAIL: self-test khong dat du ba truc - nghi phan cung. bit2 DATA_LOSS: FIFO da tran, hoac mot phep kiem tag/counter that bai - da co mau bi mat ke tu khi khoi dong. bit3..7 du tru, phai bang 0. De xuat goc de ngo cac bit nay; chung duoc dinh nghia cung luc voi firmware giai doan 5.";
+
+
+CM_ BO_ 768 "Goc nghieng ba truc, mot frame moi 20 ms (mac dinh) hoac 10/50 ms. Module goc la loai 0x2, nen node_id = 0x20 + (nhan tren vo - 1): module 1 la node 0x20, module 10 la node 0x29. HE TRUC CUA DU AN: X sang PHAI xe, Y ve DAU xe, Z LEN tren, he tay phai. Day KHONG phai ISO 8855, nen Roll quay quanh Y va Pitch quay quanh X - nguoc voi hau het tai lieu tham khao. GOC LA TUONG DOI so voi lan zero gan nhat, tru khi Flags bit0 NO_ZERO = 1. NO_ZERO va bit4 YAW_STALE chi noi ve MOC CUA TRUC YAW: NO_ZERO=1 nghia la yaw chua co moc, tuc chua tung co mot ZERO mang bit yaw duoc chap nhan, hoac da co nhung bi CLEAR_ZERO bit yaw xoa di. YAW_STALE=1 khi qua 1200 s ke tu moc yaw; neu yaw chua co moc thi dem tu luc bo loc hop nhat bat dau chay. ZERO chi roll/pitch (mat na khong co bit2) KHONG xoa hai co nay - roll va pitch co moc tuyet doi la trong luc nen khong troi, chi yaw troi, nen mot co chung cho ca ba truc se bao yen tam sai luc. Khoi nay lap lai cho module 02..10 tai base = 0x100 + node_id*0x10, tuc 0x300..0x390.";
+CM_ SG_ 768 Roll "Quay quanh truc Y (doc xe). Duong = suon PHAI chim xuong. Co moc tuyet doi la trong luc nen KHONG troi khi dung yen.";
+CM_ SG_ 768 Pitch "Quay quanh truc X (ngang xe). Duong = mui xe ngoc LEN. Co moc tuyet doi la trong luc nen KHONG troi khi dung yen.";
+CM_ SG_ 768 Yaw "Quay quanh truc Z (thang dung). Duong = xe quay sang TRAI. CANH BAO: ISM330DHCX khong co tu ke, nen yaw KHONG co moc tuyet doi - no la tich phan van toc goc va TROI VINH VIEN. Da hieu chuan offset con quay thi troi khoang 3 deg/h (bias instability, DS13012 Table 2); chua hieu chuan thi toi 3600 deg/h. Doc ANG_Status.SecondsSinceZero va GYRO_CAL_VALID TRUOC khi tin truong nay.";
+CM_ SG_ 768 Counter "Tang 1 moi frame, cuon 0 den 255. Bang dung Counter cua ANG_Accel va ANG_Rate cung nhip, nen ghep cap duoc ke ca khi arbitration tach chung ra tren timeline. Dung de phat hien frame bi mat.";
+CM_ SG_ 768 Flags "bit0 NO_ZERO: chua bao gio zero ke tu luc cap nguon - goc dang tuong doi voi tu the luc bat nguon, tuc mot thu ngau nhien, DUNG PHAN TICH. bit1 SETTLING: bo loc hop nhat chua hoi tu (khoang 2 s dau). bit2 CLIP: gia toc hoac van toc goc cham full scale trong cua so nay, hop nhat SAI - loai cua so. bit3 SAMPLE_LOSS: FIFO tran ke tu frame truoc, tich phan yaw co lo hong KHONG hoi phuc duoc. bit4 YAW_STALE: da qua 1200 s ke tu lan zero, yaw van duoc gui nhung dung tin. bit5..7 du tru, phai bang 0.";
+
+CM_ BO_ 769 "Gia toc ba truc, cung nhip voi ANG_Data. KHAC VIB_Data mot cach quan trong: day la gia toc tho da loc va CON NGUYEN TRONG LUC trong do, vi trong luc chinh la moc cua Roll va Pitch. Module rung thi tru DC di vi no do rung. Khoi nay lap lai cho module 02..10 tai base + 1.";
+CM_ SG_ 769 AccX "Truc X = sang phai xe. Thang 1 mg/dem dung chung cho MOI full scale, nen doi FS khong phai doi DBC. Chon 1 mg vi san nhieu cua cam bien la 60 ug/sqrt(Hz) x sqrt(208 Hz) = 0.87 mg - luong tu hoa dat dung tai san nhieu.";
+CM_ SG_ 769 AccY "Truc Y = ve dau xe. Xem AccX.";
+CM_ SG_ 769 AccZ "Truc Z = len tren. Nam ngang dung yen thi doc +1000 mg (DS13012 Rev 7 muc 4.6.2). Xem AccX.";
+CM_ SG_ 769 Counter "Bang dung Counter cua ANG_Data cung nhip.";
+CM_ SG_ 769 Flags "Giong ANG_Data.Flags.";
+
+CM_ BO_ 770 "Chan doan va kiem ke, 1 Hz VA ngay khi module vua chay xong mot lenh ANG_Cmd. Lan gui them do lam cho man hinh TFT thay echo trong vai mili-giay thay vi cho het mot giay; nhip 1 Hz KHONG doi, frame echo la frame gui them chu khong phai frame doi cho. SecondsSinceZero dem tu lan ZERO MANG BIT YAW duoc chap nhan gan nhat, bao hoa 65534 va khong cuon ve 0; 0xFFFF nghia la yaw chua co moc, cung dieu kien voi NO_ZERO=1 trong ANG_Data. Mot ZERO bi tu choi, hoac ZERO chi roll/pitch, KHONG doi truong nay. CmdSeq = 0 truoc lenh dau tien, nhung 0 cung la mot Seq hop le, nen phia doc phai so sanh CmdSeq voi gia tri TRUOC DO chu khong so voi mot hang so: lenh da toi khi CmdSeq DOI. Khoi nay lap lai cho module 02..10 tai base + 2.";
+CM_ SG_ 770 NodeId "Lap lai chinh node_id ma frame ID da mang - CO CHU DINH. Day la cach duy nhat phat hien HAI module bi gan TRUNG node_id: chung se phat cung ID va .blf se co hai ANG_Status mau thuan nhau o cac truong khac. Nibble cao phai bang 0x2 cho module goc; lech nghia la module bi cau hinh sai loai.";
+CM_ SG_ 770 AccelFsCode "Full scale gia toc ke dang dung. CHU Y: day KHONG phai gia tri thanh ghi. CTRL1_XL.FS[1:0] cua ISM330DHCX ma hoa 00=+-2g, 01=+-16g, 10=+-4g, 11=+-8g (DS13012 Rev 7 Table 42) - KHONG tang dan. Truong nay tang dan cho nguoi doc.";
+CM_ SG_ 770 GyroFsCode "Full scale con quay dang dung. Xem AccelFsCode ve chuyen ma hoa thanh ghi.";
+CM_ SG_ 770 Temperature "Nhiet do cua CHINH con cam bien (ISM330DHCX, 256 LSB/degC, DS13012 Table 4). Sai so tuyet doi toi +-15 degC neu khong hieu chuan mot diem, nen day la xu huong chu khong phai nhiet ke. Doc no CUNG VOI SecondsSinceZero: troi yaw 3 deg/h chi dung o nhiet do khong doi, nhiet do dang doi thi troi lon hon.";
+CM_ SG_ 770 SecondsSinceZero "So giay ke tu lan zero gan nhat, bao hoa o 65534. Gia tri 65535 (0xFFFF) nghia la CHUA TUNG ZERO. Nhan voi 3 deg/h de uoc luong troi yaw toi thieu.";
+CM_ SG_ 770 CmdSeq "Echo truong Seq cua ANG_Cmd gan nhat da nhan. Dong vong lap: thay lenh tren day ma KHONG thay echo nghia la module khong nhan duoc.";
+CM_ SG_ 770 StatusFlags "bit0 FAULT: module da chot mot loi, LED dang nhay ma. bit1 SELF_TEST_FAIL: self-test khong dat - nghi phan cung. bit2 DATA_LOSS: FIFO da tran ke tu khi khoi dong. bit3 ZERO_REJECTED: lenh zero gan nhat bi TU CHOI vi module khong dung yen - moc goc KHONG doi. bit4 GYRO_CAL_VALID: offset con quay da hieu chuan va con hieu luc; BANG 0 THI YAW VO NGHIA. bit5..7 du tru, phai bang 0.";
+
+CM_ BO_ 771 "Van toc goc tho. MAC DINH FIRMWARE KHONG PHAT message nay - no duoc dinh nghia san de khoi phai len version DBC moi khi can go loi. Bat no lam tai bus cua module do tang 50%, nen chi bat cho MOT module khi dang tim hieu vi sao yaw troi bat thuong. Khoi nay lap lai cho module 02..10 tai base + 3.";
+CM_ SG_ 771 RateX "Thang 0.125 dps/dem = 1/8, chon vi no phu du +-4095.9 dps cho MOI full scale ke ca +-4000 dps. Thang 0.1 dps se bao hoa im lang o +-3276.7.";
+CM_ SG_ 771 RateY "Xem RateX.";
+CM_ SG_ 771 RateZ "Xem RateX. Day la truc sinh ra yaw, nen no la cho dau tien phai nhin khi nghi ngo troi yaw.";
+
+CM_ BO_ 48 "Lenh tu mainboard toi mot module cu the, ID = 0x010 + node_id. Mainboard phat that len CAN1 va ghi vao .blf voi co huong TX, nen thoi diem moc goc bi doi NHIN THAY DUOC tren timeline - khong co no thi file co mot cho Roll nhay 12 deg ma khong loi giai thich. Dinh dang nay la CHUNG cho moi loai module; loai 0x3 va 0x4 se ke thua. LENH TRUNG: module bo qua mot frame khi no trung CA 8 BYTE voi lenh vua nhan VA den trong vong 1000 ms tinh tu lenh do. Ban phat lai cua tang CAN la ban sao tung bit va den sau vai ms nen van bi chan; nhung mot mainboard khoi dong lai roi bat dau lai Seq tu dau thi lenh dau tien cua no KHONG bi bo oan - do la lo hong cua luat cu chi so theo Seq. ECHO: mot ANG_Status gui ngay vai ms sau khi lenh DA chay, mang ket qua. Ma lenh la 0x04..0xFF va mat na ZERO/CLEAR_ZERO khong hop le (bang 0 hoac co bit 3..7) thi VAN echo nhung KHONG thuc thi; frame rac (DLC khac 8, hoac byte 6..7 khac 5A A5) va lenh trung thi KHONG echo, vi echo cho nhieu se lam nguoi doc .blf tuong da co mot cuoc doi thoai. Khoi nay lap lai cho module 02..10 tai 0x031..0x039.";
+CM_ SG_ 48 Cmd "Ma lenh. 0x00 PING, 0x01 ZERO, 0x02 CLEAR_ZERO, 0x03 GYRO_BIAS_CAL. 0x10 tro len danh rieng theo loai module, chua dung.";
+CM_ SG_ 48 Seq "Tang 1 moi lenh moi. Module BO QUA lenh co Seq trung lenh vua nhan. CAN tu dong phat lai khi loi, va mot lenh zero thuc thi hai lan giua luc xe dang chay se zero vao mot tu the sai.";
+CM_ SG_ 48 Arg0 "Voi ZERO va CLEAR_ZERO: mat na truc, bit0 roll, bit1 pitch, bit2 yaw. Nut tren TFT gui 0x07 (ca ba).";
+CM_ SG_ 48 Magic0 "Phai bang 0x5A. Cung Magic1 chong mot frame lac trung ID va trung DLC - hau qua cua no la du lieu bi dau doc IM LANG giua phep do.";
+CM_ SG_ 48 Magic1 "Phai bang 0xA5. Xem Magic0.";
+CM_ BO_ 1024 "Nhiet do va do am, mot frame moi 1000 ms. Module nhiet-am la loai 0x3, nen node_id = 0x30 + (nhan tren vo - 1) va khoi nay lap lai cho module 02..10 tai base + 0, voi base = 0x100 + node_id * 0x10. CHU KY PHAT CO DINH: cam bien chi lam moi moi 2 s nen khong co gi dang chon, SET_TX_PERIOD bi tu choi.";
+CM_ SG_ 1024 Temperature "Di THANG tu thanh ghi 0x0001 cua cam bien, cung don vi x10, bu 2 khi am. Khong co phep quy doi nao o giua - so tren bus khop dung so trong datasheet khi soi bang tay.";
+CM_ SG_ 1024 Humidity "Di thang tu thanh ghi 0x0000 cua cam bien, don vi x10. Xem Temperature.";
+CM_ SG_ 1024 DataAge "TUOI CUA SO DO, tinh tu lan Modbus tra loi thanh cong gan nhat. 6553.5 nghia la CHUA DOC DUOC LAN NAO ke tu khi khoi dong. DOC TRUONG NAY TRUOC KHI TIN Temperature VA Humidity: mot cam bien chet - dut day, mat nguon 12 V, cam bien treo - van cho ra frame dep de voi gia tri cuoi cung no tung doc duoc, trong y het mot phong on nhiet. Day khong phai lo xa: VIB_Status.Temperature cua module rung da dong bang dung nhu vay suot nhieu tuan truoc 2026-09-26 ma khong ai phat hien.";
+CM_ SG_ 1024 Counter "Tang 1 moi frame, cuon 0 den 255. Mot buoc nhay nghia la frame bi mat tren duong truyen, KHONG phai cam bien bi mat - de phan biet, xem DataAge.";
+CM_ SG_ 1024 Flags "bit0 NEVER_READ (chua tung noi chuyen duoc voi cam bien), bit1 TIMEOUT (giao dich gan nhat khong co tra loi), bit2 CRC_ERR, bit3 STALE (DataAge > 6 s = 3 lan lam moi), bit4 RANGE (gia tri ngoai dai -40..60 degC / 0..100 %RH cua datasheet), bit5 BUS_OFF_SEEN. NEVER_READ tach rieng khoi STALE co chu dinh: 'chua bao gio noi chuyen duoc' va 'da noi chuyen duoc nhung lau roi' la hai loi phai di sua hai cho khac nhau.";
+
+CM_ BO_ 1026 "Chan doan va kiem ke, 1 Hz, VA ngay khi nhan lenh. Khoi nay lap lai cho module 02..10 tai base + 2 - cung vi tri voi VIB_Status va ANG_Status, nen nguoi doc .blf khong phai tra bang.";
+CM_ SG_ 1026 NodeId "Lap lai chinh node_id ma frame ID da mang - CO CHU DINH. Day la cach duy nhat phat hien HAI module bi gan TRUNG node_id: hai module cung phat o mot ID se gay bit error va co the day ca hai vao bus-off.";
+CM_ SG_ 1026 TxPeriod "Chu ky phat thuc te. Luon 100 x 10 ms = 1000 ms voi loai 0x3.";
+CM_ SG_ 1026 ModbusOk "So giao dich Modbus thanh cong, cuon 0 den 65535.";
+CM_ SG_ 1026 ModbusErr "So giao dich that bai, BAO HOA o 255 chu khong cuon. '255 loi' doc la hong nang, con mot bo dem cuon ve 3 doc la gan nhu on.";
+CM_ SG_ 1026 CmdSeq "Echo Seq cua lenh vua nhan. Day la ACK duy nhat cua mot lenh, va no phai nam trong .blf: thay lenh ma khong thay echo nghia la module khong nhan.";
+CM_ SG_ 1026 StatusFlags "Cung bit nhu Flags cua TH_Data.";
+
+CM_ BO_ 64 "Lenh tu mainboard toi module nhiet-am. Dinh dang chung cho moi loai module, dac ta o VF_Main_CAN_ID_Map.md muc 2.3. Khoi nay lap lai cho module 02..10 tai 0x010 + node_id.";
+CM_ SG_ 64 Cmd "0x00 PING tra TH_Status ngay. 0x10 FORCE_READ hoi cam bien ngay khong cho het chu ky. ZERO / CLEAR_ZERO / GYRO_BIAS_CAL (0x01..0x03) KHONG co nghia voi loai nay va bi tu choi bang BAD_CMD.";
+CM_ SG_ 64 Seq "Tang 1 moi lenh moi. Module BO QUA lenh co Seq trung lenh vua nhan: CAN tu dong phat lai khi loi, va mot lenh trang thai thuc thi hai lan giua phep do la du lieu bi dau doc.";
+CM_ SG_ 64 Magic0 "Phai bang 0x5A. Cung Magic1 chong mot frame lac trung ID va trung DLC.";
+CM_ SG_ 64 Magic1 "Phai bang 0xA5. Xem Magic0.";
+
+
+
+VAL_ 1538 FixType 0 "khong co fix" 1 "dead reckoning" 2 "2D" 3 "3D" 4 "GNSS + DR" 5 "chi co thoi gian" ;
+VAL_ 770 AccelFsCode 0 "+-2 g" 1 "+-4 g" 2 "+-8 g" 3 "+-16 g" ;
+VAL_ 770 GyroFsCode 0 "+-125 dps" 1 "+-250 dps" 2 "+-500 dps" 3 "+-1000 dps" 4 "+-2000 dps" 5 "+-4000 dps" ;
+VAL_ 48 Cmd 0 "PING" 1 "ZERO" 2 "CLEAR_ZERO" 3 "GYRO_BIAS_CAL" ;
+VAL_ 786 AccelFsCode 0 "+-2 g" 1 "+-4 g" 2 "+-8 g" 3 "+-16 g" ;
+VAL_ 786 GyroFsCode 0 "+-125 dps" 1 "+-250 dps" 2 "+-500 dps" 3 "+-1000 dps" 4 "+-2000 dps" 5 "+-4000 dps" ;
+VAL_ 49 Cmd 0 "PING" 1 "ZERO" 2 "CLEAR_ZERO" 3 "GYRO_BIAS_CAL" ;
+VAL_ 802 AccelFsCode 0 "+-2 g" 1 "+-4 g" 2 "+-8 g" 3 "+-16 g" ;
+VAL_ 802 GyroFsCode 0 "+-125 dps" 1 "+-250 dps" 2 "+-500 dps" 3 "+-1000 dps" 4 "+-2000 dps" 5 "+-4000 dps" ;
+VAL_ 50 Cmd 0 "PING" 1 "ZERO" 2 "CLEAR_ZERO" 3 "GYRO_BIAS_CAL" ;
+VAL_ 818 AccelFsCode 0 "+-2 g" 1 "+-4 g" 2 "+-8 g" 3 "+-16 g" ;
+VAL_ 818 GyroFsCode 0 "+-125 dps" 1 "+-250 dps" 2 "+-500 dps" 3 "+-1000 dps" 4 "+-2000 dps" 5 "+-4000 dps" ;
+VAL_ 51 Cmd 0 "PING" 1 "ZERO" 2 "CLEAR_ZERO" 3 "GYRO_BIAS_CAL" ;
+VAL_ 834 AccelFsCode 0 "+-2 g" 1 "+-4 g" 2 "+-8 g" 3 "+-16 g" ;
+VAL_ 834 GyroFsCode 0 "+-125 dps" 1 "+-250 dps" 2 "+-500 dps" 3 "+-1000 dps" 4 "+-2000 dps" 5 "+-4000 dps" ;
+VAL_ 52 Cmd 0 "PING" 1 "ZERO" 2 "CLEAR_ZERO" 3 "GYRO_BIAS_CAL" ;
+VAL_ 850 AccelFsCode 0 "+-2 g" 1 "+-4 g" 2 "+-8 g" 3 "+-16 g" ;
+VAL_ 850 GyroFsCode 0 "+-125 dps" 1 "+-250 dps" 2 "+-500 dps" 3 "+-1000 dps" 4 "+-2000 dps" 5 "+-4000 dps" ;
+VAL_ 53 Cmd 0 "PING" 1 "ZERO" 2 "CLEAR_ZERO" 3 "GYRO_BIAS_CAL" ;
+VAL_ 866 AccelFsCode 0 "+-2 g" 1 "+-4 g" 2 "+-8 g" 3 "+-16 g" ;
+VAL_ 866 GyroFsCode 0 "+-125 dps" 1 "+-250 dps" 2 "+-500 dps" 3 "+-1000 dps" 4 "+-2000 dps" 5 "+-4000 dps" ;
+VAL_ 54 Cmd 0 "PING" 1 "ZERO" 2 "CLEAR_ZERO" 3 "GYRO_BIAS_CAL" ;
+VAL_ 882 AccelFsCode 0 "+-2 g" 1 "+-4 g" 2 "+-8 g" 3 "+-16 g" ;
+VAL_ 882 GyroFsCode 0 "+-125 dps" 1 "+-250 dps" 2 "+-500 dps" 3 "+-1000 dps" 4 "+-2000 dps" 5 "+-4000 dps" ;
+VAL_ 55 Cmd 0 "PING" 1 "ZERO" 2 "CLEAR_ZERO" 3 "GYRO_BIAS_CAL" ;
+VAL_ 898 AccelFsCode 0 "+-2 g" 1 "+-4 g" 2 "+-8 g" 3 "+-16 g" ;
+VAL_ 898 GyroFsCode 0 "+-125 dps" 1 "+-250 dps" 2 "+-500 dps" 3 "+-1000 dps" 4 "+-2000 dps" 5 "+-4000 dps" ;
+VAL_ 56 Cmd 0 "PING" 1 "ZERO" 2 "CLEAR_ZERO" 3 "GYRO_BIAS_CAL" ;
+VAL_ 914 AccelFsCode 0 "+-2 g" 1 "+-4 g" 2 "+-8 g" 3 "+-16 g" ;
+VAL_ 914 GyroFsCode 0 "+-125 dps" 1 "+-250 dps" 2 "+-500 dps" 3 "+-1000 dps" 4 "+-2000 dps" 5 "+-4000 dps" ;
+VAL_ 57 Cmd 0 "PING" 1 "ZERO" 2 "CLEAR_ZERO" 3 "GYRO_BIAS_CAL" ;
+VAL_ 64 Cmd 0 "PING" 16 "FORCE_READ" ;
+VAL_ 65 Cmd 0 "PING" 16 "FORCE_READ" ;
+VAL_ 66 Cmd 0 "PING" 16 "FORCE_READ" ;
+VAL_ 67 Cmd 0 "PING" 16 "FORCE_READ" ;
+VAL_ 68 Cmd 0 "PING" 16 "FORCE_READ" ;
+VAL_ 69 Cmd 0 "PING" 16 "FORCE_READ" ;
+VAL_ 70 Cmd 0 "PING" 16 "FORCE_READ" ;
+VAL_ 71 Cmd 0 "PING" 16 "FORCE_READ" ;
+VAL_ 72 Cmd 0 "PING" 16 "FORCE_READ" ;
+VAL_ 73 Cmd 0 "PING" 16 "FORCE_READ" ;
