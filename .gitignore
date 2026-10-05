@@ -1,10 +1,22 @@
+# STM32CubeIDE build output
 Debug/
 Release/
 *.o
 *.d
+*.su
 *.elf
 *.map
 *.list
 *.bin
 *.hex
 *.bak
+objects.list
+
+# Eclipse / CubeIDE workspace metadata - rewritten on every build
+.settings/
+.metadata/
+*.launch
+
+# OS junk
+Thumbs.db
+.DS_Store

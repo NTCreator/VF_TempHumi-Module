@@ -1,5 +1,7 @@
 # VF_TempHumi_Module — prompt giai đoạn 1: khung project
 
+> **Trạng thái: đã thực hiện 2026-10-05** — code + build xong, chờ test board. Kết quả và các chỗ lệch có chủ đích (early guard trước `HAL_Init`; B6 #3 tách thành bài 8a/8b/8c) ở `docs/VF_TH_Phase1_Report.md`.
+
 Đây là prompt cho phiên Claude Code làm việc trong repo `VF_TempHumi Module`.
 **Đọc `CLAUDE.md` trước, rồi làm theo file này.**
 

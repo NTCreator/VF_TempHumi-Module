@@ -65,6 +65,18 @@ Khi viết một hằng số lấy từ datasheet, **ghi nguồn trong comment**
 - **Không có RTOS.** Vòng lặp chính + ngắt, như hai module anh em.
 - **Không có hardware trong vòng lặp:** không flash, không debug được. Mọi bước kiểm trên phần cứng phải viết thành quy trình test để người dùng tự làm.
 - Build headless hoặc nhờ người dùng build rồi dán log. **Không coi một phase là xong khi chưa build sạch** (0 error; mọi warning phải được giải thích).
+- Build headless (đã dùng ở phase 1):
+  ```
+  P="/c/ST/STM32CubeIDE_2.2.0/STM32CubeIDE/plugins"
+  T="$P/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.14.3.rel1.win32_1.0.100.202602081740/tools/bin"
+  M="$P/com.st.stm32cube.ide.mcu.externaltools.make.win32_2.2.200.202604021615/tools/bin"
+  export PATH="$T:$M:$PATH"
+  cd Debug && make all
+  ```
+  Đường dẫn Windows `C:/...` làm hỏng PATH (bị tách ở dấu `:`). Chỉ dùng dạng MSYS.
+- **`Debug/makefile` do CubeIDE sinh và chỉ biết những file `.c` có lúc IDE build lần cuối.** Thêm file nguồn hay thư mục mới ⇒ người dùng làm **Refresh (F5) rồi Project → Build Project** một lần trong IDE; sau đó `make` headless mới thấy file đó. IDE thường đang mở nên workspace bị khoá — không chạy `headless-build` được. `Debug/` nằm trong `.gitignore`.
+- **`check_contracts` chạy ở đầu mọi lần `make`** qua `makefile.init` ở gốc repo (hook CDT: `Debug/makefile` mở đầu bằng `-include ../makefile.init`). `make clean` không bị chặn. `.gitattributes` ghim LF cho `contracts/*` — thiếu nó thì một clone mới lệch cả bốn hash.
+- Toolchain ST 14.3 bỏ qua `__attribute__((retain))`. Muốn giữ một hằng không ai tham chiếu qua `--gc-sections`, cho nó một tham chiếu thật — xem `s_fw_id` trong `main.c`.
 
 ## 4. Phần cứng
 
@@ -94,11 +106,15 @@ Suy ra từ netlist bằng cách neo vào bảy điểm chắc chắn (VDD pin 1
 |---|---|---|
 | **JP3** | 1,2 = +5 · 3,4 = CAN_H · 5,6 = CAN_L · 7,8 = GND | bus CAN1 |
 | **JP2** | 1 = GND · 2 = SWCLK · 3 = SWDIO · 4 = +3V3 · 5,6 = **+12** · 7,8 = GND12 | nạp + nguồn 12V |
-| **J1** | 1 = +12 · 2 = RS485_B · 3 = GND12 · 4 = RS485_A (+shield) | cảm biến |
+| **J1** | 1 = +12 · 2 = RS485_B · 3 = GND12 · 4 = RS485_A | cảm biến. Shield (S1/S2) chỉ nối với nhau — **thả nổi** |
 
 **Module cần HAI nguồn:** +5 V từ harness CAN1 (qua D1 → LDO RT9193 → 3V3), và **+12 V riêng qua JP2** cho cảm biến. Cảm biến chịu 5–28 VDC nhưng board đưa 12 V tới J1.
 
+**`GND12` KHÔNG nối với `GND` trên board** (netlist: net `GND12` chỉ có J1-3, JP2-7, JP2-8; sơ đồ dùng hai ký hiệu đất riêng; không có net-tie). MAX485 không cách ly, nên RS485 chỉ có chế độ chung đúng khi **âm hai nguồn được nối với nhau bên ngoài board**. Ở bàn test: nối âm 12 V với âm 5 V. Harness trên xe có làm vậy không — **chưa biết** (phát hiện ở phase 1, 2026-10-05).
+
 **JP2 không có NRST** — SWD là đường debug duy nhất qua header, giống `VF_Main`. Nhưng board **có SW1** nên vẫn reset tay được.
+
+**JP2 chân 5/6 là +12 V, ngay cạnh chân SWD.** Nạp khi chưa cấp +12 V: một đầu ST-Link cắm lệch hai chân là đưa 12 V vào SWDIO hoặc vào ST-Link.
 
 ### 4.3 ⛔ Bẫy lớn nhất của board này: DE/RE kéo lên +5 V
 
@@ -113,7 +129,7 @@ R8 pin2 → +5        R9 pin2 → +5
 
 Ba hệ quả bắt buộc:
 
-1. **PB6 phải được đặt LOW sớm nhất có thể** trong `main()`, trước mọi thứ khác.
+1. **PB6 phải được đặt LOW sớm nhất có thể** trong `main()`, trước mọi thứ khác. Phase 1 làm việc này ở `USER CODE 1`, **trước `HAL_Init()`** (`app_board_early_guard()`): `SystemClock_Config()` có thể chờ thạch anh tới 100 ms, và thạch anh chết thì nhảy thẳng vào `Error_Handler` trước khi `MX_GPIO_Init()` kịp chạy. Phần còn lại của cửa sổ (reset → startup → `main`) firmware không xoá được; chỉ đổi R8/R9 xuống GND ở lần ra PCB sau mới xoá được.
 2. Trong `.ioc`, PB6 phải để `GPIO_PIN_RESET` làm trạng thái khởi tạo — xem `docs/VF_TH_IOC_Guide.md`.
 3. **Đo bằng đồng hồ ở phase 1**: PB6 so GND phải ~0 V sau khi firmware chạy. Nếu board thật khác netlist (R8/R9 có thể là DNP), ghi lại sự thật đo được chứ đừng tin netlist.
 
@@ -186,8 +202,8 @@ STM32F303K8T6 **có FPU đơn chính xác**. Dùng `float` thoải mái, **khôn
 
 | GĐ | Nội dung | Trạng thái |
 |---|---|---|
-| **0** | **Hợp đồng**: proposal, DBC v1.5, ID Map v1.3, CAN2 v1.5 | **chưa duyệt** — xem `docs/VF_TH_CAN_Proposal.md` |
-| 1 | Khung project, `app_config.h`, LED, im lặng trên CAN, `check_contracts` | chưa làm |
+| **0** | **Hợp đồng**: proposal, DBC v1.5, ID Map v1.3, CAN2 v1.5 | **ĐÃ DUYỆT 2026-10-05**, phương án A — `docs/VF_TH_CAN_Proposal.md` |
+| **1** | Khung project, `app_config.h`, LED, im lặng trên CAN, `check_contracts` | **code + build xong 2026-10-05** (0/0, `check_contracts` đã chứng minh fail được). **Chờ test board** — `docs/VF_TH_Phase1_Test.md`; báo cáo `docs/VF_TH_Phase1_Report.md` |
 | 2 | Driver RS485 + Modbus RTU, đọc được nhiệt độ/độ ẩm | chưa làm |
 | 3 | Phát `TH_Data` + `TH_Status` lên CAN1 (silent loopback trước) | chưa làm |
 | 4 | Kho config trong flash + phát thật trên bus | chưa làm |
@@ -195,3 +211,24 @@ STM32F303K8T6 **có FPU đơn chính xác**. Dùng `float` thoải mái, **khôn
 | 6 | Cờ lỗi, self-test, tích hợp với `VF_Main` | chưa làm |
 
 **Giai đoạn 0 chặn tất cả.** ID và layout signal ràng buộc firmware của cả 10 module; đổi về sau nghĩa là nạp lại tất cả.
+
+### 7.1 Đã chốt — đừng làm lại, đừng "sửa"
+
+| Điều | Chốt | Ở đâu |
+|---|---|---|
+| Thứ tự khởi động | `app_board_early_guard()` ở `USER CODE 1`, **trước `HAL_Init`**: PB6 LOW rồi PA10 HIGH. B3 lặp lại ở `USER CODE 2` qua `app_board_enter_safe_state()` | `main.c`, `app_board.c` |
+| Hàm bị cấm cho tới khi có lý do | Không có hàm đưa transceiver sang Normal (phase 4, sẽ đòi config đã kiểm CRC làm tham số) và không có hàm bật DE (phase 2, nằm trong driver Modbus, đi cùng phép chờ TC) | `app_board.h` |
+| LED | Khởi động 50 ms / 500 ms (10%). Mã N: 50 ms sáng, 250 ms tắt, nghỉ 2000 ms, tối đa 8. Duty kiểm ở thì biên dịch. **Cùng ngôn ngữ với module góc** | `app_config.h`, `app_led.c` |
+| Mã lỗi | `APP_FAULT_NONE/HAL_INIT` = 0/1. Mã đầu tiên được chốt, mã sau chỉ đếm. Số = số lần nháy. Dự kiến 2 = cảm biến không trả lời, 3 = config sai CRC (trùng module góc). Chỉ thêm vào cuối | `app_fault.h` |
+| `Error_Handler` | Lấy LR → tắt ngắt → `MX_GPIO_Init()` lại → `app_fault_fatal(HAL_INIT, LR)` → nháy mã 1 bằng polling `SysTick COUNTFLAG` | `main.c` |
+| HardFault | về trạng thái an toàn (RS485 nhả, transceiver Standby, LED tắt) rồi treo | `stm32f3xx_it.c` |
+| Tên firmware | `s_fw_id` trong image (không có console). Bump `APP_FW_PHASE` mỗi phase | `main.c`, `app_config.h` |
+| Bộ nhớ | 64 KB flash / 12 KB SRAM / 4 KB CCM, xác nhận từ database CubeMX. Ứng dụng phải vừa **52 KB** (sau bootloader 12 KB của phase 5) — `_Static_assert` | `app_config.h` |
+
+### 7.2 Sự thật phát hiện ở phase 1, không nằm ở chỗ khác
+
+- **`GND12` không nối với `GND` trên board** — xem §4.2. Chưa biết harness trên xe có chung âm không: **phải trả lời trước phase 2**.
+- **`VF_Main` không có bản nào của `VF_TH_CAN_Proposal.md`** (module góc thì có, ở `VF_Main/docs/VF_Angle/`). Bản gốc thực tế là `docs/` của repo này — nằm ngoài vùng `check_contracts` canh.
+- Hai lỗi chữ trong hợp đồng, không ảnh hưởng firmware: proposal §5.3 ghi `0x040 + node_id` (đúng: `0x010 + node_id`); CAN2 v1.5 bảng §4.1 vẫn ghi `0x03` *chưa đặt tên*. Ghi ở `contracts/README.md`.
+- `USART1` trên F303x8 lấy clock từ **PCLK1 = 36 MHz** (`RCC_USART1CLKSOURCE_PCLK1` trong `SystemClock_Config`), không phải PCLK2.
+- Datasheet MAX485 (`MAX481.PDF` trang 2): VIH của DE/RE̅ = 2,0 V ⇒ PB6 push-pull 3,3 V đủ để bật driver dù R8/R9 kéo lên 5 V.

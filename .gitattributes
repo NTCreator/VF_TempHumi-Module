@@ -1,0 +1,24 @@
+# core.autocrlf is true on this machine, so a fresh clone would hand these files
+# to sh.exe with CRLF endings. A shell script whose shebang ends in \r does not
+# run, and a make variable that ends in \r never compares equal to what it is
+# tested against - which would silently disable the contract check this build
+# depends on. Both files stay LF everywhere.
+*.sh            text eol=lf
+makefile.init   text eol=lf
+
+# contracts/ is verified byte for byte by tools/check_contracts.sh, and that
+# hash is taken over the bytes on disk. With core.autocrlf=true and nothing
+# pinning these files, a checkout writes CRLF and every hash moves at once: the
+# build stops on the first "make" of a fresh clone and reports that the contract
+# changed, when the content is identical to the byte.
+#
+# That is worse than an inconvenience. The one thing this mechanism asks of
+# people is that they never run --update just to clear a red build, and a check
+# that fires when nothing is wrong is precisely how that rule gets broken. Pin
+# these to LF so that a moved hash means what it claims to mean.
+#
+# (VF_Vibration_Module hit exactly this - its Phase 2 report, section on the
+# first headless build after a fresh checkout. Same file as VF_Angle_Module.)
+contracts/*.md          text eol=lf
+contracts/*.dbc         text eol=lf
+contracts/SHA256SUMS    text eol=lf

@@ -1,0 +1,36 @@
+################################################################################
+# makefile.init - hand written, NOT generated. Do not delete.
+#
+# Debug/makefile (and Release/makefile) open with "-include ../makefile.init".
+# That include is an Eclipse CDT hook: CubeMX and CubeIDE never write this file,
+# so the contract check can live here instead of inside a generated makefile,
+# which CLAUDE.md 6.1 forbids touching.
+#
+# WHY A BUILD-TIME CHECK. contracts/ holds copies of files owned by the VF_Main
+# repository. If the original moves and this copy does not, the module keeps
+# transmitting a layout the analysis tools no longer expect, and every .blf
+# recorded from then on is wrong in a way nobody notices for weeks. The check
+# turns that silence into a stopped build.
+#
+# Same mechanism as VF_Vibration_Module and VF_Angle_Module, so all three
+# module repos fail the same way when VF_Main moves a contract.
+################################################################################
+
+# "make clean" stays usable even with a contract mismatch: getting back to a
+# known state must never be the thing that is blocked.
+ifneq ($(MAKECMDGOALS),clean)
+
+# Included from Debug/, so this resolves to "../". Derived from the include path
+# rather than assumed, so a build launched from elsewhere still finds the script.
+VF_REPO_ROOT       := $(dir $(lastword $(MAKEFILE_LIST)))
+VF_CHECK_CONTRACTS := $(VF_REPO_ROOT)tools/check_contracts.sh
+
+# The script writes its own report; only the exit code is captured, so a multi
+# line failure message reaches the terminal with its line breaks intact.
+VF_CONTRACTS_RC := $(shell sh "$(VF_CHECK_CONTRACTS)" >&2; echo $$?)
+
+ifneq ($(VF_CONTRACTS_RC),0)
+$(error contracts/ no longer matches VF_Main - see the report above. Fix the mismatch; running check_contracts.sh --update just to clear this defeats the point)
+endif
+
+endif
