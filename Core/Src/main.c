@@ -26,7 +26,7 @@
 /* USER CODE BEGIN Includes */
 #include "app/app_board.h"
 #include "app/app_can.h"
-#include "app/app_cfg_store.h"
+#include "app/app_cfg_boot.h"
 #include "app/app_config.h"
 #include "app/app_diag.h"
 #include "app/app_fault.h"
@@ -59,6 +59,11 @@
    main() anchors it for the linker - see USER CODE 2. */
 static const char s_fw_id[] = "VF_TempHumi_Module phase " APP_FW_PHASE APP_FW_BENCH_TAGS;
 
+/* This image's vector table, defined in startup_stm32f303k8tx.s. Wherever the
+   linker places the image (0x08000000 alone, 0x08003000 behind the
+   bootloader), VTOR taken from this symbol is right by construction. */
+extern const uint32_t g_pfnVectors[];
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -86,6 +91,14 @@ int main(void)
      purpose: SystemClock_Config below can wait 100 ms for the crystal, and a
      dead crystal goes to Error_Handler before MX_GPIO_Init ever runs. */
   app_board_early_guard();
+
+  /* Phase 5: the application may sit at 0x08003000 behind the bootloader.
+     The bootloader sets VTOR before jumping, but a debug launch from CubeIDE
+     starts the application directly, so the application sets it itself -
+     before HAL_Init, whose SysTick is the first interrupt to need it. */
+  SCB->VTOR = (uint32_t)g_pfnVectors;
+  __DSB();
+  __ISB();
 
   /* USER CODE END 1 */
 
@@ -137,6 +150,7 @@ int main(void)
      sensor (a bench erase stalls the CPU; no Modbus transaction may be in
      flight) and before CAN (which asks it for the node_id). */
   app_diag_init();
+  g_diag.app_base = SCB->VTOR;   /* must read 0x08003000 behind the bootloader */
   app_led_init(HAL_GetTick());
   app_cfg_boot();
   app_th_init(HAL_GetTick());

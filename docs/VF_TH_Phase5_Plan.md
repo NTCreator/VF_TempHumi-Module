@@ -1,6 +1,6 @@
 # Giai đoạn 5 — Kế hoạch: bootloader và giao thức cấu hình CAN2
 
-**Trạng thái: CHỜ DUYỆT** (2026-10-07). Chưa viết dòng code nào. Năm câu hỏi ở mục 11. Hướng dẫn tạo project bootloader: **`docs/VF_TH_IOC_Guide.md` Phần B** — làm được ngay, song song với việc duyệt.
+**Trạng thái: ĐÃ DUYỆT 2026-10-07** — cả năm câu hỏi ở mục 11 theo đề xuất (câu 5, dây J2: chưa trả lời — bài 6 tuỳ vào đó). Phía ứng dụng đã làm; code bootloader chờ project `VF_TempHumi_Bootloader` do người dùng tạo. Hướng dẫn tạo project bootloader: **`docs/VF_TH_IOC_Guide.md` Phần B** — làm được ngay, song song với việc duyệt.
 
 Căn cứ: CAN2 Protocol **v1.5** §3, §4, §4.1, §4.2, §5 (cả năm bất biến, kể cả câu v1.4 "config không hợp lệ ⇒ ở lại"); ID Map v1.3; kết quả GĐ 4 (`app_cfg` thuần, CRC chip = CRC PC); module góc **6a-2 và 6a-2b** (`VF_Angle_Module/docs/VF_Angle_Phase6a2_Plan.md`, `…_Report.md`, `…Phase6a2b_Plan.md`) — chép cách làm, không chép code.
 

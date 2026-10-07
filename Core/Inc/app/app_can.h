@@ -41,7 +41,7 @@ typedef struct
                                1 init, 2 filter, 3 start (also in app_fault detail) */
   uint8_t  mode;            /* APP_CAN_MODE_* */
   uint8_t  node_id;         /* from the config, or 0xFF */
-  uint8_t  node_id_source;  /* APP_CFG_SOURCE_* (app_cfg_store.h) */
+  uint8_t  node_id_source;  /* APP_CFG_SOURCE_* (app_cfg_boot.h) */
   uint8_t  transceiver_on;  /* 1 = TJA1044 in Normal */
   uint8_t  stb_level;       /* PA10 as read back after init: 1 standby, 0 Normal */
 

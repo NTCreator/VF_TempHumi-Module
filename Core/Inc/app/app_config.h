@@ -21,7 +21,7 @@
    wired to the sensor, not out of the board. "Printed at boot" therefore means
    embedded in the image, where a debugger or `strings` on the .elf finds it -
    see s_fw_id in main.c. */
-#define APP_FW_PHASE              "4"      /* bump each phase */
+#define APP_FW_PHASE              "5"      /* bump each phase */
 #define APP_FW_VERSION            1u       /* TH_Status byte 0, FwVersion (proposal 5.2) */
 
 /* ---- Memory - STM32F303K8T6 -------------------------------------- */
@@ -52,8 +52,14 @@
 #define APP_CFG_PAGE_KB           2u
 #define APP_APP_FLASH_KB          (APP_MCU_FLASH_KB - APP_BOOT_FLASH_KB - APP_CFG_PAGE_KB)  /* 50 KB */
 #define APP_FLASH_BASE_ADDR       0x08000000u
-/* tools/check_linker.sh reads this line: keep it a plain hex literal. */
-#define APP_CFG_FLASH_ADDR        0x0800F800u
+/* tools/check_linker.sh reads the next three lines: keep them plain hex
+ * literals. The bootloader includes this header, so both images - and the
+ * script that checks both linker scripts - take the map from here. */
+#define APP_BOOT_BASE             0x08000000u   /* bootloader, 12 KB (phase 5) */
+#define APP_IMAGE_BASE            0x08003000u   /* application behind it, 50 KB */
+#define APP_CFG_FLASH_ADDR        0x0800F800u   /* config, the last 2 KB page */
+#define APP_BOOT_SIZE             (APP_BOOT_FLASH_KB * 1024u)
+#define APP_IMAGE_SIZE            (APP_APP_FLASH_KB * 1024u)
 
 /* ---- Module type and node_id ------------------------------------- */
 /* Contract: VF_Main_CAN_ID_Map.md v1.3 section 2.1, proposal section 2.
@@ -304,6 +310,9 @@ _Static_assert(APP_BOOT_FLASH_KB + APP_APP_FLASH_KB + APP_CFG_PAGE_KB == APP_MCU
                "flash map: 12 + 50 + 2 = 64 KB");
 _Static_assert(APP_CFG_FLASH_ADDR == APP_FLASH_BASE_ADDR + (APP_MCU_FLASH_KB - APP_CFG_PAGE_KB) * 1024u,
                "the config page is the last 2 KB page of 64 KB");
+_Static_assert(APP_BOOT_BASE == APP_FLASH_BASE_ADDR, "the bootloader starts flash");
+_Static_assert(APP_IMAGE_BASE == APP_BOOT_BASE + APP_BOOT_SIZE, "the application follows the bootloader");
+_Static_assert(APP_CFG_FLASH_ADDR == APP_IMAGE_BASE + APP_IMAGE_SIZE, "the config page follows the application");
 _Static_assert(APP_NODE_ID_OK(APP_NODE_ID_BENCH), "the bench config must be a valid node of type 0x3");
 
 #endif /* APP_APP_CONFIG_H */

@@ -16,7 +16,7 @@
 #define APP_APP_DIAG_H
 
 #include "app/app_can.h"
-#include "app/app_cfg_store.h"
+#include "app/app_cfg_boot.h"
 #include "app/app_th.h"
 
 #include <stdint.h>
@@ -31,6 +31,9 @@ typedef struct
   uint32_t      magic;
   uint8_t       fw_version;              /* APP_FW_VERSION */
   uint8_t       fw_phase;                /* APP_FW_PHASE as a number */
+  uint32_t      app_base;                /* phase 5: VTOR = where this image's vector table
+                                            is. Behind the bootloader it must read
+                                            APP_IMAGE_BASE, 0x08003000 = 134230016 */
 
   /* Phase 2: the sensor transactions - see app_th.h */
   app_th_diag_t th;
@@ -38,7 +41,7 @@ typedef struct
   /* Phase 3: CAN1 - see app_can.h. From phase 4: NORMAL with a valid config */
   app_can_diag_t can;
 
-  /* Phase 4: the config as read at boot - see app_cfg_store.h */
+  /* Phase 4: the config as read at boot - see app_cfg_boot.h */
   app_cfg_diag_t cfg;
 } app_diag_t;
 

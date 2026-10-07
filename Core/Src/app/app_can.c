@@ -9,7 +9,7 @@
 #include "app/app_can.h"
 
 #include "app/app_board.h"
-#include "app/app_cfg_store.h"
+#include "app/app_cfg_boot.h"
 #include "app/app_diag.h"
 #include "app/app_fault.h"
 #include "app/app_frame.h"
@@ -150,17 +150,25 @@ void app_can_init(uint32_t now_ms)
     return;
   }
 
+  /* Transceiver BEFORE HAL_CAN_Start (phase 5; phase 4 had it after). bxCAN
+     is still in init mode here, so CANTX is recessive and nothing reaches
+     the wire. Start then waits for 11 recessive bits on the REAL bus before
+     taking part. The other order lets bxCAN sync to the idle RXD of a
+     standby transceiver, then join a busy bus in the middle of somebody
+     else's frame - read garbage, and as an error-active node answer with an
+     error flag that destroys that frame. The config is handed over as the
+     proof the function demands. */
+  d->transceiver_on = (s_live && app_board_can_transceiver_normal(cfg)) ? 1u : 0u;
+
   if (HAL_CAN_Start(&hcan) != HAL_OK)
   {
-    can_fail(CAN_STEP_START);
+    can_fail(CAN_STEP_START);   /* puts the transceiver back in standby */
+    d->transceiver_on = 0u;
+    d->stb_level = app_board_can_stb_level();
     return;
   }
 
-  /* Transceiver last: bxCAN is running, and the config is handed over as the
-     proof the function demands. */
-  d->transceiver_on = (s_live && app_board_can_transceiver_normal(cfg)) ? 1u : 0u;
   d->stb_level = app_board_can_stb_level();
-
   d->status = 0u;
   s_running = true;
 }

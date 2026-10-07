@@ -354,7 +354,9 @@ Ba file của ứng dụng được **link** vào bootloader:
 
 Để nó **sau** `../Core/Inc`: `main.h` của **bootloader** phải được tìm thấy trước `main.h` của ứng dụng. Các header `app/app_*.h` chỉ có bên ứng dụng nên được tìm thấy ở đường thứ hai.
 
-> Claude sẽ tách `app_cfg_store.c` thành hai phần (đọc/ghi flash dùng chung; phần `g_diag` / LED / công tắc bench sang `app_cfg_boot.c` chỉ của ứng dụng) để bootloader không kéo theo `g_diag`, `app_fault`, `app_led`. Nếu bạn làm B6 trước khi Claude tách xong, build bootloader sẽ báo thiếu `g_diag` — bình thường, chưa cần sửa gì.
+> **Đã tách xong (2026-10-07):** `app_cfg_store.c` giờ chỉ đọc/ghi/xoá flash — ký hiệu ngoài duy nhất nó cần là `app_cfg_seal` (trong `app_cfg.c`), HAL flash và `memcpy`/`memcmp`/`memset`. Phần `g_diag` / LED / công tắc bench đã sang `app_cfg_boot.c`, **chỉ của ứng dụng — đừng link file này**.
+>
+> Project **ứng dụng** có một file mới (`app_cfg_boot.c`): **Refresh + Build Project** ứng dụng một lần.
 
 ---
 

@@ -1,20 +1,23 @@
 /**
   ******************************************************************************
   * @file    app_cfg_store.h
-  * @brief   The config page in flash: read, write, erase, and the boot-time
-  *          verdict every other module asks for.
+  * @brief   The config page in flash: read, write, erase. Nothing else.
+  *
+  * Shared by BOTH images: the application reads the page at boot, and the
+  * bootloader's COMMIT (CAN2 0x20) writes it - through this very file, linked
+  * into VF_TempHumi_Bootloader, never copied. So it depends on nothing but
+  * app_cfg and the HAL flash driver: no g_diag, no fault module, no LED.
+  * The application's use of the result (g_diag.cfg, fault code 3, the bench
+  * switches) is in app_cfg_boot.
   *
   * The page is the last 2 KB of flash, APP_CFG_FLASH_ADDR. Reading is a plain
-  * memcpy (flash is memory mapped). Writing erases the whole page and programs
+  * memcpy (flash is memory mapped). Writing erases the whole page, programs
   * 16 bytes, then reads them back.
   *
   * Between the erase and the end of programming the page holds a record that
   * fails its own CRC, so a power cut at that moment leaves an unconfigured -
   * and therefore silent - module (CAN2 section 5, invariant 3), never one
   * with a guessed node_id.
-  *
-  * In phase 4 only the bench switches write (app_config.h); in phase 5 the
-  * bootloader's COMMIT will, while no application runs. Never while measuring.
   ******************************************************************************
   */
 #ifndef APP_APP_CFG_STORE_H
@@ -22,58 +25,27 @@
 
 #include "app/app_cfg.h"
 
-#include <stdbool.h>
 #include <stdint.h>
 
-#define APP_CFG_SOURCE_NONE     0u   /* no valid config: silent */
-/* 1 was phase 3's compile-time constant - retired, never reused. */
-#define APP_CFG_SOURCE_CONFIG   2u   /* a valid config was already in flash */
-#define APP_CFG_SOURCE_BENCH    3u   /* this build wrote it (APP_CFG_BENCH_WRITE) */
-
-#define APP_CFG_OP_NOT_TRIED    0xFFu
-#define APP_CFG_OP_OK           0u
-#define APP_CFG_OP_FAILED       1u
-
-/* g_diag.cfg */
-typedef struct
-{
-  uint8_t  state;            /* app_cfg_state_t of the config in use */
-  uint8_t  state_at_boot;    /* app_cfg_state_t as found, before any bench action */
-  uint8_t  node_id;          /* from the config, or 0xFF */
-  uint8_t  node_id_source;   /* APP_CFG_SOURCE_* */
-  uint8_t  bench_write;      /* the switches this build was made with */
-  uint8_t  bench_erase;
-  uint8_t  bench_loopback;
-  uint8_t  write_status;     /* APP_CFG_OP_* */
-  uint8_t  erase_status;     /* APP_CFG_OP_* */
-  uint8_t  module_type;      /* as stored */
-  uint16_t version;          /* as stored */
-  uint32_t magic;            /* as stored: 0x31464354 = "TCF1", 0xFFFFFFFF = blank */
-  uint32_t crc_stored;
-  uint32_t crc_calc;         /* over the 12 stored bytes */
-  uint32_t writes;           /* page writes this boot: 0 on every boot after the first */
-} app_cfg_diag_t;
+/* Result of a write or an erase. 0 = done and verified; anything else names
+   the step that failed. The bootloader answers CAN2 0x03 for any non-zero. */
+#define APP_CFG_WR_OK         0u
+#define APP_CFG_WR_UNLOCK     1u   /* HAL_FLASH_Unlock refused */
+#define APP_CFG_WR_ERASE      2u   /* page erase failed */
+#define APP_CFG_WR_PROGRAM    3u   /* a half-word program failed */
+#define APP_CFG_WR_LOCK       4u   /* HAL_FLASH_Lock refused */
+#define APP_CFG_WR_VERIFY     5u   /* read back does not match - the only result that counts */
 
 /** @brief Copy the 16 bytes at APP_CFG_FLASH_ADDR. A blank page reads 0xFF. */
 void app_cfg_store_read(app_cfg_t *out);
 
 /**
   * @brief Seal, erase the page, program, lock, read back and compare.
-  * @return true only if the bytes in flash now equal the sealed record.
+  * @return APP_CFG_WR_OK only if the bytes in flash now equal the sealed record.
   */
-bool app_cfg_store_write(app_cfg_t *c);
+uint8_t app_cfg_store_write(app_cfg_t *c);
 
-/** @brief Erase the page (bench only). True if it reads blank afterwards. */
-bool app_cfg_store_erase(void);
-
-/**
-  * @brief Read and validate the config once, at boot - and act on the bench
-  *        switches. Call after app_led_init() (it may latch fault code 3)
-  *        and before app_th_init() (an erase stalls the CPU).
-  */
-void app_cfg_boot(void);
-
-/** @brief The validated config, or NULL. There is no path from NULL to a node_id. */
-const app_cfg_t *app_cfg_active(void);
+/** @brief Erase the page. APP_CFG_WR_OK only if the whole page reads blank after. */
+uint8_t app_cfg_store_erase(void);
 
 #endif /* APP_APP_CFG_STORE_H */
