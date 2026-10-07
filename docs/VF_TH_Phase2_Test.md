@@ -51,6 +51,7 @@ CubeIDE → Debug → cửa sổ **Live Expressions** → thêm `g_diag`. Mở `
 
 | # | Làm gì | Mong đợi | Nếu khác |
 |---|---|---|---|
+| **0** | **Trước bài 1, đo bằng đồng hồ:** J1 chân 1 so với chân 3; rồi JP2 chân 7 so với JP3 chân 7 (áp và thông mạch) | ≈ 12 V; 0 V và **thông mạch** (chung âm) | Không có 12 V ⇒ cảm biến không có nguồn: mọi giao dịch sẽ là TIMEOUT. *(Đã gặp 2026-10-07: lần chạy đầu cho `count[1]` tăng đều, lý do là board chưa cấp 12 V)* |
 | **1** | Cảm biến cắm sẵn, cấp +5 V và +12 V, chạy. Quan sát 1 phút | LED: 2 Hz trong ~2 s đầu, rồi **1 nháy mỗi 5 s**. `count[0]` tăng 1 mỗi 2 s; **mọi `count[1..9]` = 0**; `age_x100ms` dao động 0…20; `flags` = 0; `fresh` = 1. Ghi `latency_ms` | `count[1]` tăng ⇒ không có trả lời: dây A/B, 12 V, chung âm. `count[3]` ⇒ nhiễu/dây dài. `count[8]` ⇒ ghi `last_uart_error`. Gửi lại `last_rx[]` |
 | **2** | **Nhiệt độ so với cảm biến phòng lab.** Đặt cảm biến SHT cạnh cảm biến phòng, chờ **15 phút** cho cân bằng (thời gian đáp ứng ≤ 25 s, nhưng vỏ cần thời gian). Ghi 3 cặp số cách nhau 1 phút | Chênh lệch ổn định, \|Δ\| trong khoảng ±0,5 °C (SHT, datasheet tr. 1) **cộng** sai số của cảm biến phòng | \|Δ\| > 2 °C ⇒ báo lại, kèm vị trí đặt hai cảm biến |
 | **3** | **Độ ẩm — hợp lý và phản ứng.** (a) Ghi `rh_x10` 1 phút khi để yên. (b) **Thở nhẹ** vào cảm biến 2–3 giây | (a) Trong khoảng phòng lab thường gặp (~30…80 %RH), dao động ≤ ±1 %RH. (b) RH **tăng rõ** trong ≤ 8 s (datasheet tr. 1), rồi về lại trong 1–2 phút. T tăng nhẹ, chậm hơn | Không đổi khi thở ⇒ nghi số bị đóng băng: kiểm `age_x100ms` có về 0 mỗi 2 s không |
@@ -73,6 +74,7 @@ CubeIDE → Debug → cửa sổ **Live Expressions** → thêm `g_diag`. Mở `
 
 | # | Kết quả (PASS / FAIL + ghi chú) |
 |---|---|
+| 0 | J1 1–3 = ___ V; chung âm: có / không |
 | 1 | `latency_ms` = ___ ms |
 | 2 | SHT / phòng lab: ___ / ___ °C, ___ / ___ °C, ___ / ___ °C |
 | 3 | (a) RH = ___ %RH, dao động ±___ · (b) thở: RH ___ → ___ %RH trong ___ s |

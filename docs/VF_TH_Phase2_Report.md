@@ -1,6 +1,6 @@
 # Giai đoạn 2 — Báo cáo
 
-**Trạng thái: CODE + BUILD XONG 2026-10-07 — chờ test trên board** (`docs/VF_TH_Phase2_Test.md`, điền bảng mục 3 rồi gửi lại).
+**Trạng thái: CODE + BUILD XONG 2026-10-07 — đang test trên board** (kết quả từng phần ở mục 8; quy trình `docs/VF_TH_Phase2_Test.md`).
 
 Firmware hỏi cảm biến SHT mỗi 2 s qua RS485 / Modbus RTU, giữ số đo hợp lệ cuối cùng **cùng tuổi của nó**, đếm mọi kết cục của mọi giao dịch, và nói tất cả qua `g_diag` (Live Expressions) và LED. Vẫn không phát CAN — đúng phạm vi `docs/VF_TH_Phase2_Plan.md`.
 
@@ -144,3 +144,35 @@ Tổng xấu nhất **~0,9–1 KB**, ngang mức tối thiểu 1 KB (`_Min_Stack
 4. **Đường `MB_ERR_TX` và `MB_ERR_EXCEPTION` chưa từng chạy trên phần cứng** — chỉ host test (exception) và đọc mã (TX timeout).
 5. **`HAL_UART_Init` khi đổi baud** gọi `UART_CheckIdleState`, chờ TEACK/REACK với timeout `HAL_UART_TIMEOUT_VALUE` = 0x1FFFFFF ms của HAL. Hai cờ đó lên sau vài chu kỳ, nên thực tế không chờ; nhưng giới hạn trên là của HAL, không phải của firmware này. Chỉ chạy trong quét chẩn đoán (tối đa một lần mỗi lần khởi động).
 6. **Các việc mở từ giai đoạn 1 vẫn còn** — CLAUDE.md §7.2: chung âm 12 V / 5 V trong hệ data logger; proposal TH chưa có nhà ở `VF_Main`; hai lỗi chữ trong hợp đồng; watchdog.
+
+# 8. Kết quả test trên board — đang chạy
+
+Image `a7717c2`. Người dùng chạy `docs/VF_TH_Phase2_Test.md`.
+
+## 8.1 Lần chạy đầu: chưa cấp 12 V — cảm biến im lặng (2026-10-07)
+
+Chạy bài 1 khi **board chưa có +12 V** (cảm biến không có nguồn). `g_diag` sau 5 lần hỏi:
+
+| Trường | Giá trị | Đúng thiết kế? |
+|---|---|---|
+| `magic` | 1414022193 = `0x54484431` "THD1" | ✓ đúng struct |
+| `fw_version` / `fw_phase` | 1 / 2 | ✓ |
+| `started` | 5 | |
+| `count[1]` TIMEOUT | 5; mọi `count` khác 0 | ✓ **`started = ok + lỗi` = 0 + 5** |
+| `last_rx_len` | 0 | ✓ không một byte nào, kể cả rác (`count[8]` = 0) |
+| `flags` | 3 = NEVER_READ + TIMEOUT | ✓ không kéo theo STALE |
+| `age_x100ms` | 65535 | ✓ "chưa đọc lần nào" |
+| `modbus_err` | 5 | ✓ |
+| `baud` | 4800 | ✓ |
+| LED | 2 Hz trong ~8–10 s đầu, rồi 2 nháy mỗi ~2 s | ✓ **mã 2 sau 10 s**, sống |
+
+Không phải lỗi firmware — nhưng là **bằng chứng đầu tiên trên phần cứng** rằng trường hợp "cảm biến im lặng" được báo đúng ở mọi kênh: bộ đếm, cờ, tuổi, LED. Đó chính là phần nửa đầu của bài 6. `scan` không được đọc ở lần này (ảnh chụp lúc `started` = 5, quét chạy ở ~12 s).
+
+Bài học, đã thêm vào quy trình (bài 0): **đo 12 V ở J1 và chung âm trước bài 1.** Module cần hai nguồn (CLAUDE.md §4.2) và thiếu nguồn thứ hai trông giống hệt một lỗi dây.
+
+## 8.2 Có 12 V
+
+| # | Kết quả |
+|---|---|
+| 1 | **PASS** — `count[0]` tăng, mọi `count[1..9]` = 0, LED 1 nháy / 5 s (mẫu "đang đo"). `latency_ms`: chưa báo |
+| 2–9 | chưa chạy |
