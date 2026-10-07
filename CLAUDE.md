@@ -205,7 +205,7 @@ STM32F303K8T6 **có FPU đơn chính xác**. Dùng `float` thoải mái, **khôn
 |---|---|---|
 | **0** | **Hợp đồng**: proposal, DBC v1.5, ID Map v1.3, CAN2 v1.5 | **ĐÃ DUYỆT 2026-10-05**, phương án A — `docs/VF_TH_CAN_Proposal.md` |
 | **1** | Khung project, `app_config.h`, LED, im lặng trên CAN, `check_contracts` | **XONG 2026-10-07.** Build 0/0, `check_contracts` đã chứng minh fail được. Test board đạt: R8/R9 có lắp thật (PB6 = 5 V khi reset) **và firmware thắng được chúng (PB6 = 0 V khi chạy)**; im lặng trên CAN1 cả phát lẫn ACK; chip K8. Báo cáo `docs/VF_TH_Phase1_Report.md` §8 |
-| **2** | Driver RS485 + Modbus RTU, đọc được nhiệt độ/độ ẩm | **code + build xong 2026-10-07** (0/0, test host 362/362, 5 đột biến đều bị bắt). **Chờ test board** — `docs/VF_TH_Phase2_Test.md`; báo cáo `docs/VF_TH_Phase2_Report.md` |
+| **2** | Driver RS485 + Modbus RTU, đọc được nhiệt độ/độ ẩm | **XONG 2026-10-07.** Build 0/0, test host 362/362. Board: 25,4 °C vs phòng ~25 °C; 51 %RH, phản ứng khi thở; rút/cắm, khởi động không cảm biến, quét (cả đường "found" ở 9600) đều đạt; 10 phút 0 lỗi. **Mở:** độ chính xác RH (không có ẩm kế); DE chưa đo bằng oscilloscope (thay bằng phân tích, báo cáo §8.3); `latency_ms` chưa có số. Báo cáo `docs/VF_TH_Phase2_Report.md` |
 | 3 | Phát `TH_Data` + `TH_Status` lên CAN1 (silent loopback trước) | chưa làm |
 | 4 | Kho config trong flash + phát thật trên bus | chưa làm |
 | 5 | Bootloader + giao thức CAN2 | chưa làm |
@@ -233,10 +233,14 @@ STM32F303K8T6 **có FPU đơn chính xác**. Dùng `float` thoải mái, **khôn
 | Tên firmware | `s_fw_id` trong image (không có console). Bump `APP_FW_PHASE` mỗi phase | `main.c`, `app_config.h` |
 | Bộ nhớ | 64 KB flash / 12 KB SRAM / 4 KB CCM, xác nhận từ database CubeMX. Ứng dụng phải vừa **52 KB** (sau bootloader 12 KB của phase 5) — `_Static_assert` | `app_config.h` |
 
-### 7.2 Sự thật phát hiện ở phase 1, không nằm ở chỗ khác
+### 7.2 Sự thật phát hiện được, không nằm ở chỗ khác
 
 - **`GND12` không nối với `GND` trên board** — xem §4.2. Hệ data logger độc lập: nguồn 12 V và nguồn 5 V có chung âm không — cần biết trước khi lắp đặt thật.
 - **`VF_Main` không có bản nào của `VF_TH_CAN_Proposal.md`** (module góc thì có, ở `VF_Main/docs/VF_Angle/`). Bản gốc thực tế là `docs/` của repo này — nằm ngoài vùng `check_contracts` canh.
 - Hai lỗi chữ trong hợp đồng, không ảnh hưởng firmware: proposal §5.3 ghi `0x040 + node_id` (đúng: `0x010 + node_id`); CAN2 v1.5 bảng §4.1 vẫn ghi `0x03` *chưa đặt tên*. Ghi ở `contracts/README.md`.
 - `USART1` trên F303x8 lấy clock từ **PCLK1 = 36 MHz** (`RCC_USART1CLKSOURCE_PCLK1` trong `SystemClock_Config`), không phải PCLK2.
 - Datasheet MAX485 (`MAX481.PDF` trang 2): VIH của DE/RE̅ = 2,0 V ⇒ PB6 push-pull 3,3 V đủ để bật driver dù R8/R9 kéo lên 5 V.
+- **(GĐ 2) Cả 11 khung ví dụ trong datasheet SHT có CRC đúng** — dùng làm vector test (`tests/test_drv_modbus.c`). Nhiệt độ âm là bù hai.
+- **(GĐ 2) Thiếu 12 V trông y hệt lỗi dây**: mọi giao dịch TIMEOUT, LED mã 2. Đã gặp ở lần chạy đầu. Quy trình test GĐ 2 có bài 0: đo 12 V ở J1 và chung âm trước.
+- **(GĐ 2) Người dùng có bộ USB–RS485 trên PC** — đặt được baud/địa chỉ cảm biến (đã dùng cho bài 11). Firmware vẫn không bao giờ ghi cảm biến.
+- **(GĐ 2) DE hạ muộn nhất ~25–30 µs sau bit stop** (ước lượng từ `objdump`, `-O0`); slave Modbus không được trả lời trước 7,3 ms. Chưa đo bằng oscilloscope.

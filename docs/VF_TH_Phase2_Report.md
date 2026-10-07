@@ -1,6 +1,6 @@
 # Giai đoạn 2 — Báo cáo
 
-**Trạng thái: CODE + BUILD XONG 2026-10-07 — đang test trên board** (kết quả từng phần ở mục 8; quy trình `docs/VF_TH_Phase2_Test.md`).
+**Trạng thái: XONG 2026-10-07** — build sạch, test host 362/362, test board đạt (mục 8). Hai việc mở: độ chính xác độ ẩm (không có ẩm kế) và đo DE bằng oscilloscope (thay bằng phân tích, mục 8.3).
 
 Firmware hỏi cảm biến SHT mỗi 2 s qua RS485 / Modbus RTU, giữ số đo hợp lệ cuối cùng **cùng tuổi của nó**, đếm mọi kết cục của mọi giao dịch, và nói tất cả qua `g_diag` (Live Expressions) và LED. Vẫn không phát CAN — đúng phạm vi `docs/VF_TH_Phase2_Plan.md`.
 
@@ -138,7 +138,7 @@ Tổng xấu nhất **~0,9–1 KB**, ngang mức tối thiểu 1 KB (`_Min_Stack
 
 ## 7. Vấn đề còn mở
 
-1. **Chưa test trên board.** Chờ bảng kết quả.
+1. ~~**Chưa test trên board.**~~ Đã test 2026-10-07 — mục 8.
 2. **Thời gian trả lời của cảm biến chưa biết** — datasheet không ghi. `MB_REPLY_TIMEOUT_MS` = 200 ms là lựa chọn của firmware. Bài 1 / 8 đo `latency_ms` / `latency_max_ms`; nếu max gần 200 ms thì phải xem lại.
 3. **Độ ẩm chưa có phép kiểm độ chính xác** (không có ẩm kế). Nếu sau này có, chạy lại bài 2 cho RH.
 4. **Đường `MB_ERR_TX` và `MB_ERR_EXCEPTION` chưa từng chạy trên phần cứng** — chỉ host test (exception) và đọc mã (TX timeout).
@@ -170,9 +170,53 @@ Không phải lỗi firmware — nhưng là **bằng chứng đầu tiên trên 
 
 Bài học, đã thêm vào quy trình (bài 0): **đo 12 V ở J1 và chung âm trước bài 1.** Module cần hai nguồn (CLAUDE.md §4.2) và thiếu nguồn thứ hai trông giống hệt một lỗi dây.
 
-## 8.2 Có 12 V
+## 8.2 Có 12 V — mọi bài
 
-| # | Kết quả |
+| # | Bài | Kết quả |
+|---|---|---|
+| 1 | Chạy 1 phút | **PASS** — `count[0]` tăng, mọi `count[1..9]` = 0, LED 1 nháy / 5 s. `latency_ms`: không báo số |
+| 2 | T so với phòng lab | **PASS (tương đối)** — `t_x10` = **254** (25,4 °C), phòng ~25 °C: Δ ≈ +0,4 °C, trong ±0,5 °C của datasheet tr. 1 |
+| 3 | RH để yên; thở vào | **PASS (độ hợp lý)** — `rh_x10` = **510** (51,0 %RH), hợp lý cho phòng lab; thở vào thì tăng dần đều. **Không phải phép kiểm độ chính xác** — không có ẩm kế tham chiếu |
+| 3b | Nắm tay | **PASS** — T tăng dần đều lên ~28–30 °C |
+| 4, 4b | Oscilloscope DE | **KHÔNG ĐO** — oscilloscope chưa sẵn sàng. Người dùng chấp nhận thay bằng phân tích: mục 8.3 |
+| 5 | Rút J1 30 s, cắm lại | **PASS** — `flags` = **2** (TIMEOUT) ngay sau lần hỏi kế; khi `age` > 60: `flags` = **10** (TIMEOUT + STALE), LED mã 2; `count[1]` +~15. Cắm lại: `flags` = 0, `count[0]` tăng, `age` về 0 rồi đếm tiếp, LED về 1 nháy / 5 s. Số đo **giữ nguyên số cũ** suốt lúc rút — tuổi là thứ nói nó cũ |
+| 6 | Khởi động không cảm biến | **PASS** — `flags` = 3, `age` = 65535, LED mã 2; `scan.ran` = 1, `done` = 1, `status` = {1, 1, 1}. Cắm cảm biến ⇒ đọc lại được (nên baud đã về 4800) |
+| 7 | Tắt 12 V 30 s | **PASS** |
+| 8 | 10 phút liên tục | **PASS** — 0 lỗi (≈ 300 giao dịch). `latency_max_ms`: không báo số |
+| 9 | Hồi quy GĐ 1 | **PASS** — CAN1 im lặng, SWD sống |
+| 10 | Đảo A/B | không chạy (tuỳ chọn) — dây giữ đúng datasheet tr. 2 |
+| 11 | Cảm biến đặt 9600 qua PC | **PASS** — quét tìm ra 9600 **mà không chấp nhận**: đường "found" của quét đã chạy trên phần cứng thật |
+
+## 8.3 Bài 4 thay bằng phân tích — DE hạ đúng lúc
+
+Bài 4 kiểm hai điều: DE **không hạ sớm** (cắt byte cuối) và **không hạ muộn** (đụng câu trả lời).
+
+**Không thể sớm — do cấu trúc, đã xác minh trong mã:** DE chỉ hạ ở ba chỗ: `HAL_UART_TxCpltCallback`, `HAL_UART_ErrorCallback`, `drv_rs485_stop()`. HAL chỉ gọi `HAL_UART_TxCpltCallback` từ `UART_EndTransmit_IT`, và chỉ khi `ISR.TC` và `CR1.TCIE` cùng bật (`stm32f3xx_hal_uart.c:2404` → `:3819`). TC là cờ phần cứng bật **sau bit stop của byte cuối**. Lỗi UART không xảy ra trong lúc phát (RE̅ = DE ⇒ bộ thu tắt). `drv_rs485_stop()` chỉ chạy sau khi giao dịch đã kết thúc hoặc sau 50 ms timeout.
+
+**Không thể muộn — ước lượng trên image thật** (`objdump` của `a7717c2`, `-O0`):
+
+| Đường từ TC tới ghi BSRR | Số lệnh (tĩnh) |
 |---|---|
-| 1 | **PASS** — `count[0]` tăng, mọi `count[1..9]` = 0, LED 1 nháy / 5 s (mẫu "đang đo"). `latency_ms`: chưa báo |
-| 2–9 | chưa chạy |
+| `USART1_IRQHandler` | 8 |
+| `HAL_UART_IRQHandler` tới lệnh gọi `UART_EndTransmit_IT` | ≤ 543 (cận trên: coi như chạy hết mọi nhánh) |
+| `UART_EndTransmit_IT` → `HAL_UART_TxCpltCallback` → `app_board_rs485_release` → `HAL_GPIO_WritePin` | 38 + 25 + 10 + 23 |
+| **Tổng, cận trên** | **≈ 650 lệnh** |
+
+≈ 650 lệnh × ~2 chu kỳ (flash 2 wait-state, prefetch bật) ≈ 1 300 chu kỳ ≈ **18 µs** ở 72 MHz, cộng tối đa vài µs nếu ngắt rơi vào một vùng tắt ngắt ngắn của vòng lặp chính (`drv_rs485_snapshot`). **DE hạ muộn nhất ~25–30 µs sau bit stop — dưới 15% một bit (208 µs).** Một slave Modbus RTU chỉ coi khung đã kết thúc sau **3,5 ký tự lặng = 7,3 ms**, nên không thể trả lời sớm hơn thế: biên **> 250 lần**.
+
+**Bằng chứng thực nghiệm khớp với phân tích:** bài 8 — ≈ 300 giao dịch, **0 lỗi**. Cảm biến chỉ trả lời request có CRC đúng, và byte cuối của request là byte CRC cao (`0x0B`): mỗi lần trả lời là một lần byte cuối đã ra dây nguyên vẹn. Không một `CRC_ERR`, `SHORT` hay `UART` nào ⇒ câu trả lời chưa lần nào đụng driver của chính module.
+
+**Còn mở:** đo thật bằng oscilloscope khi có (bài 4 / 4b giữ nguyên trong quy trình). Không chặn giai đoạn 3.
+
+## 8.4 Tiêu chí của kế hoạch
+
+| Kế hoạch | Kết quả |
+|---|---|
+| Số đọc khớp tham chiếu | Nhiệt độ **đạt (tương đối)**, Δ ≈ +0,4 °C. Độ ẩm: **chỉ kiểm được độ hợp lý và phản ứng** — không có tham chiếu |
+| DE hạ sau bit stop | **phân tích + thực nghiệm gián tiếp** (8.3); chưa đo bằng oscilloscope |
+| Rút dây ⇒ lỗi tăng, tuổi tăng; cắm lại ⇒ hồi phục | **đạt** (bài 5, 6, 7) |
+| 0 lỗi trong 10 phút | **đạt** (bài 8) |
+| Hồi quy GĐ 1 | **đạt** (bài 9) |
+| Build 0/0, test host | **đạt** — 0/0, 362/362 |
+
+**Giai đoạn 2 khép lại 2026-10-07**, với hai việc mở ghi rõ ở trên: độ chính xác độ ẩm (cần ẩm kế) và đo DE bằng oscilloscope. Số `latency_ms` / `latency_max_ms` người dùng không báo; 0 timeout trên ~300 giao dịch chứng minh chúng **dưới 200 ms**, nhưng con số thật vẫn chưa biết — đọc ở lần debug tới.
