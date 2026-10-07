@@ -1,6 +1,6 @@
 # Giai đoạn 3 — Kế hoạch: `TH_Data` + `TH_Status`, chỉ silent loopback
 
-**Trạng thái: CHỜ DUYỆT** (2026-10-07). Chưa viết dòng code nào. Hai câu hỏi ở mục 10.
+**Trạng thái: ĐÃ DUYỆT 2026-10-07** — cả hai câu hỏi ở mục 10 theo **phương án A** (T/RH = 0/0 trước lần đọc đầu; `Counter` theo khe 1 s).
 
 Căn cứ: DBC v1.5 (`BO_ 1024` `TH_Data_01`, `BO_ 1026` `TH_Status_01` và các `CM_`), proposal §5.1–5.2, ID Map v1.3 §2.1; kết quả giai đoạn 2 (`app_meas` đã có tuổi, cờ, bộ đếm); cách module góc làm giai đoạn 5 (`VF_Angle_Module/docs/VF_Angle_Phase5_Plan.md`) — chép cách làm, không chép code.
 

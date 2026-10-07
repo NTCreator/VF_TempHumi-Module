@@ -19,9 +19,9 @@
    the LED after the wrong problem.
 
    _Static_assert rather than #if: the preprocessor cannot see enum constants,
-   and in an #if APP_FAULT_SENSOR would quietly evaluate to 0. Keep this
+   and in an #if APP_FAULT_CAN would quietly evaluate to 0. Keep this
    pointing at the highest code when appending one. */
-_Static_assert((int)APP_FAULT_SENSOR <= (int)APP_LED_CODE_MAX,
+_Static_assert((int)APP_FAULT_CAN <= (int)APP_LED_CODE_MAX,
                "Highest fault code exceeds APP_LED_CODE_MAX - the LED could not tell it apart");
 
 static app_fault_t s_fault = APP_FAULT_NONE;

@@ -25,6 +25,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "app/app_board.h"
+#include "app/app_can.h"
 #include "app/app_config.h"
 #include "app/app_diag.h"
 #include "app/app_fault.h"
@@ -117,9 +118,10 @@ int main(void)
          on the measurement bus. A duplicate node_id takes the bus down, it
          does not just make the log messy (CLAUDE.md 1.2).
 
-     CAN is initialised by the generated code but never started (phase 3), so
-     the controller stays in init mode (CANTX recessive) behind a transceiver
-     in standby - silent on CAN1 twice over. */
+     From phase 3, app_can_init() below restarts bxCAN in silent loopback:
+     CANTX held recessive, no ACK given - behind a transceiver in standby.
+     Silent on CAN1 twice over, and nothing in this firmware can change
+     either until phase 4 brings a CRC-checked config. */
   app_board_enter_safe_state();
 
   /* Nothing reads s_fw_id, so --gc-sections would drop it, and this
@@ -133,6 +135,7 @@ int main(void)
   app_diag_init();
   app_led_init(HAL_GetTick());
   app_th_init(HAL_GetTick());
+  app_can_init(HAL_GetTick());
 
   /* USER CODE END 2 */
 
@@ -150,6 +153,7 @@ int main(void)
     const uint32_t now_ms = HAL_GetTick();
 
     app_th_task(now_ms);
+    app_can_task(now_ms);   /* after app_th: a reply that just landed goes out this second */
     app_led_task(now_ms);
   }
   /* USER CODE END 3 */

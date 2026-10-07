@@ -17,17 +17,30 @@
 CC      = gcc
 CFLAGS  := -std=c11 -Wall -Wextra -Werror -Wdouble-promotion -Wfloat-conversion -Wconversion -O2 -I../Core/Inc
 
-TESTS   := test_drv_modbus test_app_meas
+TESTS   := test_drv_modbus test_app_meas test_app_frame test_dbc_layout
+
+# contracts/ holds exactly one DBC by rule (contracts/README.md). All matches
+# are passed on: if there are none or two, test_dbc_layout refuses to run.
+DBC     := $(wildcard ../contracts/*.dbc)
 
 all: $(addsuffix .run,$(TESTS))
 
 %.run: %.exe
 	./$<
 
+test_dbc_layout.run: test_dbc_layout.exe
+	./$< $(DBC)
+
 test_drv_modbus.exe: test_drv_modbus.c ../Core/Src/app/drv_modbus.c
 	$(CC) $(CFLAGS) -o $@ $^
 
 test_app_meas.exe: test_app_meas.c ../Core/Src/app/app_meas.c ../Core/Src/app/drv_modbus.c
+	$(CC) $(CFLAGS) -o $@ $^
+
+test_app_frame.exe: test_app_frame.c ../Core/Src/app/app_frame.c
+	$(CC) $(CFLAGS) -o $@ $^
+
+test_dbc_layout.exe: test_dbc_layout.c ../Core/Src/app/app_frame.c
 	$(CC) $(CFLAGS) -o $@ $^
 
 clean:

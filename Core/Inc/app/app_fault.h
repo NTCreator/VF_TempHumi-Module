@@ -36,12 +36,19 @@ typedef enum
   APP_FAULT_HAL_INIT  = 1,  /* clock config or a generated MX_*_Init failed: Error_Handler;
                                or USART1 could not be reconfigured at run time (phase 2,
                                detail = APP_FAULT_DETAIL_UART_REINIT). LATCHED */
-  APP_FAULT_SENSOR    = 2   /* sensor not answering. NOT LATCHED and never passed to
+  APP_FAULT_SENSOR    = 2,  /* sensor not answering. NOT LATCHED and never passed to
                                app_fault_raise(): app_th shows it as a live status
                                (app_led_set_status) while nothing valid has been read
                                APP_TH_SILENT_LED_MS after boot, or while the reading is
                                STALE, and drops it when readings return. Phase 2 plan,
                                question 1, option A, approved 2026-10-07 */
+  /* 3 = no valid config (phase 4) and 4 are kept free: VF_Angle_Module uses
+     3 for the config and 4 for "sensor stopped delivering", which code 2
+     covers here. */
+  APP_FAULT_CAN       = 5   /* bxCAN init, filter or start failed. LATCHED but NOT fatal:
+                               the module keeps measuring, it just cannot speak. Detail =
+                               step (1 init, 2 filter, 3 start) << 8 | HAL error code low
+                               byte. Same number and meaning as VF_Angle_Module. Phase 3 */
 } app_fault_t;
 
 /* Detail value for APP_FAULT_HAL_INIT raised outside Error_Handler. An

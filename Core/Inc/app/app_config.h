@@ -21,7 +21,7 @@
    wired to the sensor, not out of the board. "Printed at boot" therefore means
    embedded in the image, where a debugger or `strings` on the .elf finds it -
    see s_fw_id in main.c. */
-#define APP_FW_PHASE              "2"      /* bump each phase */
+#define APP_FW_PHASE              "3"      /* bump each phase */
 #define APP_FW_VERSION            1u       /* TH_Status byte 0, FwVersion (proposal 5.2) */
 
 /* ---- Memory - STM32F303K8T6 -------------------------------------- */
@@ -75,7 +75,26 @@
  * value). The sensor refreshes every 2 s, so faster would only repeat numbers. */
 #define APP_TX_PERIOD_MS          1000u
 #define APP_STATUS_PERIOD_MS      1000u
-#define APP_TX_PERIOD_X10MS       (APP_TX_PERIOD_MS / 10u)  /* TH_Status TxPeriod_x10ms */
+#define APP_TX_PERIOD_X10MS       (APP_TX_PERIOD_MS / 10u)  /* TH_Status TxPeriod, DBC factor 10 ms */
+
+/* Frames of this module inside its block (ID map 2.1): TH_Data at base + 0,
+ * TH_Status at base + 2. base + 1 and base + 3 stay empty on purpose, so
+ * Status sits at base + 2 for every module type. DLC is always 8 (DBC v1.5,
+ * BO_ 1024 / BO_ 1026). */
+#define APP_CAN_DATA_OFFSET       0u
+#define APP_CAN_STATUS_OFFSET     2u
+#define APP_FRAME_DLC             8u
+
+/* Phase 3 only: there is no config store yet (phase 4), so the node_id is a
+ * constant - label 1. It is harmless ONLY because phase 3 has no way onto
+ * the wire: bxCAN in silent loopback, transceiver in standby, and no
+ * function exists that would change either. Phase 4 deletes this constant
+ * and takes the node_id from a CRC-checked config; there is no other source.
+ * The gate test sets it to APP_NODE_ID_UNSET (0xFF). */
+#define APP_CAN_NODE_ID_PHASE3    0x30u
+
+/* TH_Status CmdSeq until commands exist (phase 6). */
+#define APP_CMD_SEQ_NONE          0u
 
 /* ---- SHT RS485 sensor - SHT datasheet ---------------------------- */
 #define SHT_SLAVE_ADDR_DEFAULT    0x01u    /* p.6 "Note": factory address 1 */
@@ -212,9 +231,12 @@ _Static_assert(!APP_NODE_ID_OK(APP_NODE_ID_UNSET), "an unset node_id must never 
 _Static_assert(APP_CAN_BASE(0x30u) == 0x400u && APP_CAN_BASE(0x39u) == 0x490u, "proposal section 2: base 0x400..0x490");
 _Static_assert(APP_CAN_CMD_ID(0x30u) == 0x040u && APP_CAN_CMD_ID(0x39u) == 0x049u, "proposal section 2: command 0x040..0x049");
 
-/* Proposal 5.2: TxPeriod_x10ms is one byte and reads 100 for 1000 ms. */
-_Static_assert(APP_TX_PERIOD_X10MS == 100u, "TH_Status TxPeriod_x10ms must read 100");
-_Static_assert(APP_TX_PERIOD_X10MS <= 0xFFu, "TxPeriod_x10ms is a single byte");
+/* DBC CM_ SG_ 1026 TxPeriod: one byte, factor 10 ms, "always 100 x 10 ms =
+   1000 ms for type 0x3". */
+_Static_assert(APP_TX_PERIOD_X10MS == 100u, "TH_Status TxPeriod must read 100");
+_Static_assert(APP_TX_PERIOD_X10MS <= 0xFFu, "TxPeriod is a single byte");
+_Static_assert(APP_CAN_BASE(0x30u) + APP_CAN_DATA_OFFSET == 1024u, "DBC BO_ 1024 TH_Data_01");
+_Static_assert(APP_CAN_BASE(0x30u) + APP_CAN_STATUS_OFFSET == 1026u, "DBC BO_ 1026 TH_Status_01");
 
 /* The Modbus timing is derived from the baud rate, not typed twice. */
 _Static_assert(MB_CHAR_US == (MB_BITS_PER_CHAR * 1000000u) / SHT_BAUD_DEFAULT,

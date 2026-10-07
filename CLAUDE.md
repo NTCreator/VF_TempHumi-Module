@@ -206,7 +206,7 @@ STM32F303K8T6 **có FPU đơn chính xác**. Dùng `float` thoải mái, **khôn
 | **0** | **Hợp đồng**: proposal, DBC v1.5, ID Map v1.3, CAN2 v1.5 | **ĐÃ DUYỆT 2026-10-05**, phương án A — `docs/VF_TH_CAN_Proposal.md` |
 | **1** | Khung project, `app_config.h`, LED, im lặng trên CAN, `check_contracts` | **XONG 2026-10-07.** Build 0/0, `check_contracts` đã chứng minh fail được. Test board đạt: R8/R9 có lắp thật (PB6 = 5 V khi reset) **và firmware thắng được chúng (PB6 = 0 V khi chạy)**; im lặng trên CAN1 cả phát lẫn ACK; chip K8. Báo cáo `docs/VF_TH_Phase1_Report.md` §8 |
 | **2** | Driver RS485 + Modbus RTU, đọc được nhiệt độ/độ ẩm | **XONG 2026-10-07.** Build 0/0, test host 362/362. Board: 25,4 °C vs phòng ~25 °C; 51 %RH, phản ứng khi thở; rút/cắm, khởi động không cảm biến, quét (cả đường "found" ở 9600) đều đạt; 10 phút 0 lỗi. **Mở:** độ chính xác RH (không có ẩm kế); DE chưa đo bằng oscilloscope (thay bằng phân tích, báo cáo §8.3); `latency_ms` chưa có số. Báo cáo `docs/VF_TH_Phase2_Report.md` |
-| 3 | Phát `TH_Data` + `TH_Status` lên CAN1 (silent loopback trước) | chưa làm |
+| **3** | Phát `TH_Data` + `TH_Status` lên CAN1 (silent loopback trước) | **XONG 2026-10-07.** Build 0/0, test host 1577/1577 (11 đột biến đều bị bắt). Board: 61 s ⇒ 122 frame quay về khớp từng byte; thứ tự byte chứng minh (`0D 01` = 26,9 °C); frame chưa đọc `00 00 00 00 FF FF 00 01`; cổng `0xFF` ⇒ 0 frame; analyzer: không gì lên dây. Báo cáo `docs/VF_TH_Phase3_Report.md` |
 | 4 | Kho config trong flash + phát thật trên bus | chưa làm |
 | 5 | Bootloader + giao thức CAN2 | chưa làm |
 | 6 | Cờ lỗi, self-test, tích hợp với `VF_Main` | chưa làm |
@@ -227,7 +227,11 @@ STM32F303K8T6 **có FPU đơn chính xác**. Dùng `float` thoải mái, **khôn
 | Số ngoài dải (GĐ 2) | Giữ số, bật `RANGE`, tuổi về 0 (câu hỏi 3, A) | `app_meas.c` |
 | Quét chẩn đoán (GĐ 2) | Một lần mỗi lần khởi động, sau 5 lần hỏi không có số hợp lệ: 4800 / 9600 / 2400 × `0xFF` đọc `0x07D0`. **Chỉ báo vào `g_diag.th.scan`, không bao giờ chấp nhận, quay về 4800** (câu hỏi 2, A) | `app_th.c` |
 | Không ghi cảm biến | Firmware **chỉ đọc**, mãi mãi. `drv_modbus` chỉ có hàm 0x03 | `drv_modbus.h` |
-| Console | `g_diag` (magic `THD1` = `0x54484431`) đọc bằng Live Expressions. `g_diag.th.count[]` đánh số theo `mb_status_t` | `app_diag.h`, `app_th.h` |
+| Console | `g_diag` (magic `THD1` = `0x54484431`) đọc bằng Live Expressions. `g_diag.th.count[]` đánh số theo `mb_status_t`; `g_diag.can` từ GĐ 3 | `app_diag.h`, `app_th.h`, `app_can.h` |
+| CAN1 (GĐ 3) | **Silent loopback là hằng số của GĐ 3**: `app_can_init` gán `CAN_MODE_SILENT_LOOPBACK` rồi gọi lại `HAL_CAN_Init` trước `HAL_CAN_Start` (không sửa file sinh ra). Filter nhận mọi ID → FIFO0, đọc bằng thăm dò, không ngắt CAN. Hỏng ⇒ `APP_FAULT_CAN` = 5, chốt, **không fatal** | `app_can.c` |
+| Frame (GĐ 3) | `TH_Data` + `TH_Status` **mỗi 1000 ms, cảm biến sống hay chết** (hợp đồng: `DataAge` nói sự thật). **Một tick chụp, hai frame** ⇒ `StatusFlags` == `Flags`. Chưa đọc ⇒ T = RH = 0, `DataAge` `0xFFFF`, `NEVER_READ` (câu hỏi 1, A). **`Counter` +1 mỗi khe 1 s** khi cổng mở, dù mailbox có nhận hay không (câu hỏi 2, A). Mailbox đầy ⇒ bỏ, `tx_full++`, không phát lại. Tên trường theo **DBC** (`StatusFlags`, `TxPeriod`), không theo proposal §5.2 | `app_can.c`, `app_frame.c` |
+| `node_id` (GĐ 3) | Hằng `APP_CAN_NODE_ID_PHASE3 = 0x30` — **GĐ 4 phải xoá** và lấy từ config có CRC. Cổng `app_frame_node_ok` (= `APP_NODE_ID_OK`) đứng trước mọi thứ chạm bxCAN | `app_config.h`, `app_can.c` |
+| Layout vs DBC | `tests/test_dbc_layout.c` **đọc thẳng `contracts/*.dbc`** và so từng signal với bit firmware thật sự ghi (mặt nạ toàn 1 + mẫu `0x12A5` cho thứ tự byte). DBC lên version ⇒ test này phải chạy lại và đạt | `tests/` |
 | `Error_Handler` | Lấy LR → tắt ngắt → `MX_GPIO_Init()` lại → `app_fault_fatal(HAL_INIT, LR)` → nháy mã 1 bằng polling `SysTick COUNTFLAG` | `main.c` |
 | HardFault | về trạng thái an toàn (RS485 nhả, transceiver Standby, LED tắt) rồi treo | `stm32f3xx_it.c` |
 | Tên firmware | `s_fw_id` trong image (không có console). Bump `APP_FW_PHASE` mỗi phase | `main.c`, `app_config.h` |

@@ -15,6 +15,7 @@
 #ifndef APP_APP_DIAG_H
 #define APP_APP_DIAG_H
 
+#include "app/app_can.h"
 #include "app/app_th.h"
 
 #include <stdint.h>
@@ -32,6 +33,9 @@ typedef struct
 
   /* Phase 2: the sensor transactions - see app_th.h */
   app_th_diag_t th;
+
+  /* Phase 3: CAN1 in silent loopback - see app_can.h */
+  app_can_diag_t can;
 } app_diag_t;
 
 extern app_diag_t g_diag;
