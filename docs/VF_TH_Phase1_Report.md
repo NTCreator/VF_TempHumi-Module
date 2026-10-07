@@ -1,6 +1,6 @@
 # Giai đoạn 1 — Báo cáo
 
-**Trạng thái: CODE + BUILD XONG 2026-10-05 — chờ test trên board** (`docs/VF_TH_Phase1_Test.md`, điền bảng mục 3 rồi gửi lại).
+**Trạng thái: CODE + BUILD XONG 2026-10-05. Test board 2026-10-07: mọi bài bắt buộc đã báo đều đạt — CÒN THIẾU bài 5 (PB6 khi firmware đang chạy), tức B6 #1.** Kết quả ở mục 8.
 
 Khung project chạy bare-metal: nhả bus RS485 trước mọi thứ, im lặng trên CAN1, báo hiệu bằng LED L2. Giai đoạn này không nói chuyện với cảm biến, không phát CAN, không có bootloader — đúng phạm vi `docs/VF_TH_Phase1_Prompt.md`.
 
@@ -198,3 +198,46 @@ Chuỗi sâu nhất trong code ứng dụng là đường fatal: `Error_Handler`
 7. **Shield của J1 thả nổi** (S1/S2 chỉ nối với nhau). CLAUDE.md §4.2 trước đây ghi "4 = RS485_A (+shield)" — đã sửa. Nếu dây dài có nhiễu ở giai đoạn 2, đây là nghi can thứ hai sau việc thiếu 120 Ω.
 8. **Không có watchdog** (IWDG chưa bật trong `.ioc`). Giai đoạn 1 không cần; giai đoạn 2 trở đi một Modbus treo phải được bắt bằng timeout (đã có `MB_REPLY_TIMEOUT_MS`), nhưng một vòng lặp treo thì chỉ IWDG bắt được. Đề xuất bật ở giai đoạn 6 — cần sửa `.ioc` ⇒ người dùng làm.
 9. **DE bằng phần mềm ở giai đoạn 2:** PB6 là push-pull, mức cao của nó là 3,3 V trong khi R8/R9 kéo lên 5 V. MAX485 nhận 3,3 V là HIGH hợp lệ (`MAX481.PDF` trang 2, DC Electrical Characteristics: VIH của DE, DI, RE̅ = **2,0 V min**, VIL = 0,8 V max); dòng chảy ngược (5 − 3,3) V / 5 kΩ ≈ 0,34 mA, vô hại. Chỉ ghi lại để giai đoạn 2 không ngạc nhiên khi đo thấy 3,3 V thay vì 5 V lúc phát.
+
+# 8. Kết quả test trên board — 2026-10-07
+
+Người dùng chạy `docs/VF_TH_Phase1_Test.md` trên board đầu tiên, image của commit `b67378b`.
+
+Người dùng đánh số **lệch một** so với quy trình (bài 0 của quy trình được báo là "bài 1"…). Bảng dưới dùng **số của quy trình**, đối chiếu theo nội dung từng bài:
+
+| # quy trình | Báo là | Bài | Kết quả |
+|---|---|---|---|
+| 0 | bài 1 | Giữ SW1, đo PB6 và STB | **PB6 = 5 V, STB = 3,3 V** — xem 8.1 |
+| 1 | bài 2 | Cấp nguồn, chưa nạp | **PASS** — L1 sáng, L2 tối |
+| 2 | bài 3 | Nạp qua SWD | **PASS** |
+| 3 | bài 4 | Nhịp L2 | **PASS** — nháy ngắn 2 lần/giây |
+| 3b | — | Live Expressions | không chạy (tuỳ chọn) |
+| 4 | bài 5 | `0x1FFFF7CC` | **PASS** — `0x0040` = 64 KB ⇒ đúng STM32F303**K8** |
+| **5** | — | **PB6 khi firmware đang chạy** | **CHƯA CÓ SỐ** — xem 8.2 |
+| 5b | — | Độ rộng xung PB6 lúc bật nguồn | không chạy (tuỳ chọn) |
+| 6 | bài 6 | PA10 và STB | **PASS** — cả hai ≈ 3,3 V: TJA1044 ở Standby |
+| 7 | bài 7 | Rút–cắm nguồn, SWD kết nối lại | **PASS** — `.ioc` không tắt SWJ |
+| 8a | bài 8a | Bus cô lập, rút–cắm nguồn 5 lần | **PASS** — không frame, không error frame |
+| 8b | bài 8b | Analyzer phát, không ai khác trên bus | **PASS** — không có ACK ⇒ **module không ACK** |
+| 8c | bài 8c | Bus CAN1 thật | **PASS** — không có gì trong `0x400`–`0x49F` |
+| 9 | bài 9 | Cắm/rút cảm biến 3 lần | **PASS** — không có gì xảy ra |
+| — | — | Dòng tiêu thụ 5 V / 12 V | chưa đo (chỉ là mốc) |
+| — | — | Harness trên xe có chung âm 5 V / 12 V? | **chưa trả lời** |
+
+## 8.1 Điều đã được chứng minh
+
+- **R8/R9 có lắp trên board thật** (bài 0: PB6 = 5 V khi MCU bị giữ reset). Bẫy CLAUDE.md §4.3 là có thật, không phải chỉ trên netlist: **từ lúc có điện tới `app_board_early_guard()`, MAX485 đang phát**.
+- **Trong lúc MCU reset, STB vẫn ở mức cao (3,3 V)** dù PA10 thả nổi — cùng mức với lúc firmware chủ động giữ Standby (bài 6). Tức là có thứ giữ STB lên khi không ai lái nó (nhiều khả năng là pull-up nội của TJA1044; datasheet không có trong repo). Hệ quả: **transceiver không vào Normal trong cửa sổ reset**. Bài 8a (rút–cắm nguồn 5 lần khi analyzer nghe, không một error frame nào) xác nhận cùng điều đó từ phía bus.
+- **Module im lặng trên CAN1, cả phát lẫn ACK** (8a, 8b, 8c). 8b là phép thử thật của B6 #3: analyzer là node duy nhất còn lại và không nhận được ACK.
+- **SWD sống sót qua mất nguồn** (bài 7).
+- **Chip là K8, 64 KB** (bài 4) — phân vùng bootloader 12 KB + ứng dụng 52 KB của phase 5 đứng vững.
+- Nhịp 2 lần/giây ⇒ SysTick đúng 1 ms ⇒ gián tiếp xác nhận PLL 72 MHz lên từ HSE 8 MHz. HSE chết thì `Error_Handler` đã nháy mã 1.
+
+## 8.2 Còn thiếu để khép giai đoạn 1
+
+**Bài 5 — PB6 so GND khi firmware đang chạy, mong đợi ≈ 0 V.** Đây là B6 #1 của prompt, và là phép đo duy nhất chứng minh trực tiếp rằng firmware **thắng** được R8/R9. Bài 0 chỉ chứng minh cái bẫy có thật; các bài còn lại không thay được nó:
+
+- Bài 9 đạt không chứng minh được PB6 thấp: giai đoạn 1 không nói chuyện với cảm biến, nên MAX485 phát hay nhận thì cũng "không có gì xảy ra".
+- Đo A/B cũng không thay được: driver bật với DI = 1 cho ra cùng cực tính với phân cực fail-safe (quy trình mục 4).
+
+Nếu bài 5 ra ≈ 5 V thì giai đoạn 2 sẽ không bao giờ nhận được trả lời của cảm biến, và nguyên nhân sẽ trông giống hệt một lỗi dây.

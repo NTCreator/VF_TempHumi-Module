@@ -203,7 +203,7 @@ STM32F303K8T6 **có FPU đơn chính xác**. Dùng `float` thoải mái, **khôn
 | GĐ | Nội dung | Trạng thái |
 |---|---|---|
 | **0** | **Hợp đồng**: proposal, DBC v1.5, ID Map v1.3, CAN2 v1.5 | **ĐÃ DUYỆT 2026-10-05**, phương án A — `docs/VF_TH_CAN_Proposal.md` |
-| **1** | Khung project, `app_config.h`, LED, im lặng trên CAN, `check_contracts` | **code + build xong 2026-10-05** (0/0, `check_contracts` đã chứng minh fail được). **Chờ test board** — `docs/VF_TH_Phase1_Test.md`; báo cáo `docs/VF_TH_Phase1_Report.md` |
+| **1** | Khung project, `app_config.h`, LED, im lặng trên CAN, `check_contracts` | **code + build xong 2026-10-05** (0/0, `check_contracts` đã chứng minh fail được). **Test board 2026-10-07: mọi bài đã báo đều đạt** (R8/R9 có lắp thật; im lặng trên CAN1 cả phát lẫn ACK; chip K8). **Còn thiếu bài 5 — PB6 ≈ 0 V khi firmware chạy (B6 #1)**. Báo cáo `docs/VF_TH_Phase1_Report.md` §8 |
 | 2 | Driver RS485 + Modbus RTU, đọc được nhiệt độ/độ ẩm | chưa làm |
 | 3 | Phát `TH_Data` + `TH_Status` lên CAN1 (silent loopback trước) | chưa làm |
 | 4 | Kho config trong flash + phát thật trên bus | chưa làm |
