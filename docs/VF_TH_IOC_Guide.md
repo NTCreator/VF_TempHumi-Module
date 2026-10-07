@@ -222,3 +222,151 @@ STM32F303K8T6 có **64 KB flash**. Module góc dùng hết 44,6 KB cho ứng d�
 | 6 | NVIC | `CAN_RX0_IRQn` và `USART1_IRQn` được bật |
 
 Mục 5 là mục dễ mất nhất khi Generate lại, và cũng là mục **im lặng nhất khi sai**: `PB6` sai mức làm module giữ bus RS485, `PA10` sai mức làm module ACK trên bus đo trước khi được cấu hình.
+
+## A12. *(GĐ 4)* Linker script của ứng dụng — sửa tay sau mỗi lần Generate
+
+`STM32F303K8TX_FLASH.ld`: `FLASH ... LENGTH = 50K` (`ORIGIN` = `0x8000000` tới GĐ 5, `0x8003000` từ GĐ 5). Một lần Generate có thể trả nó về `64K`; `tools/check_linker.sh` làm build **đỏ** khi điều đó xảy ra — không phải sửa gì khác ngoài con số.
+
+---
+---
+
+# Phần B — Project bootloader `VF_TempHumi_Bootloader` (giai đoạn 5)
+
+Người dùng làm phần này **bằng tay trong CubeIDE / CubeMX**, trước khi Claude viết code bootloader. Claude không sửa `.ioc` (CLAUDE.md §6.1).
+
+Bootloader **không đọc cảm biến** và **không nói Modbus**: nó chỉ có CAN, ba chân GPIO, flash. Nhưng nó **chạy trước ứng dụng sau mỗi lần cấp nguồn** — nên nó thừa hưởng nguyên cái bẫy lớn nhất của board này (CLAUDE.md §4.3): **PB6 phải xuống thấp trước mọi thứ**, vì từ lúc có điện MAX485 đang phát. Bootloader nghe ít nhất 1 s, và **ở lại mãi mãi** khi chưa có config — một bootloader quên PB6 sẽ giữ bus RS485 **vĩnh viễn**.
+
+Cách trình bày theo `VF_Angle_Module/docs/VF_Angle_IOC_Guide.md` Phần B — mục nào ở đây nói ngắn thì mục tương ứng bên đó nói đủ.
+
+---
+
+## B1. Tạo project — **bên trong thư mục repo**
+
+`File → New → STM32 Project`:
+
+| Mục | Giá trị |
+|---|---|
+| MCU | **STM32F303K8Tx** (LQFP32) — giống A1 |
+| Project Name | **`VF_TempHumi_Bootloader`** |
+| **Location** | **bỏ chọn "Use default location"**, chọn **`<workspace>/VF_TempHumi_Module/VF_TempHumi_Bootloader`** |
+| Code generator | **Generate peripheral initialization as a pair of .c/.h files** ✓ |
+
+Khi hỏi "Initialize all peripherals with their default Mode?" → **No**.
+
+> **Vì sao bên trong repo:** bootloader dùng chung ba file nguồn với ứng dụng (B6) qua đường dẫn tương đối, và nó phải nằm trong git **cùng commit** với ứng dụng — hai image cùng một định dạng config. Đúng như `VF_Angle_Module/VF_Angle_Bootloader/`.
+
+---
+
+## B2. Chỉ bật những thứ này
+
+| Khối | Cấu hình | Giống phần A? |
+|---|---|---|
+| RCC | HSE = **Crystal/Ceramic Resonator** | ✅ A2 |
+| Clock | **72 / 36 / 72 MHz** (HSE 8 MHz → PLL ×9; APB1 /2) | ✅ A4 — **phải giống hệt**: cùng bit timing CAN |
+| **SYS** | **Debug = `Serial Wire`**, Timebase SysTick | ✅ A3 — ⛔ **mục quan trọng nhất**: bootloader chạy trước ứng dụng ở mọi lần cấp nguồn; nó tắt SWD thì board chết SWD **dù ứng dụng đúng** |
+| CAN | Activated; Prescaler **4**, BS1 **15 Times**, BS2 **2 Times**, SJW **1 Time**, Normal | ✅ A5 |
+| GPIO | ba chân, **cùng nhãn, cùng mức ban đầu như phần A** — bảng dưới | ✅ A7 |
+| Project Manager | **Heap `0x0`**, Stack `0x400` | khác A: không `malloc` trong bootloader — heap 0 biến điều đó thành ràng buộc của linker |
+
+### GPIO — ba chân, **nhãn phải giống hệt phần A**
+
+| Chân | User Label | Output level **ban đầu** | Mode | Pull | Speed |
+|---|---|---|---|---|---|
+| `PA10` | **`EN_CAN1`** | **High** (standby) | Push Pull | No pull | Low |
+| `PB6` | **`ENA_RS485`** | **Low** (MAX485 nhận) | Push Pull | No pull | Low |
+| `PB0` | **`LED_DEBUG`** | **High** (LED tắt) | Push Pull | No pull | Low |
+
+> ⚠️ **Nhãn không phải chuyện thẩm mỹ.** Bootloader link **`app_board.c` của ứng dụng** (B6) để dùng **đúng** hàm `app_board_early_guard()` đã đo trên board ở GĐ 1 (PB6 = 5 V khi reset, 0 V khi chạy). `app_board.c` dùng `ENA_RS485_Pin`, `EN_CAN1_Pin`, `LED_DEBUG_Pin` từ `main.h`. Sai một chữ ⇒ không build được — đó là điều tốt. **Nhãn đúng mà chân sai** thì không gì bắt được, nên đối chiếu chân với bảng §4.1 CLAUDE.md.
+
+### KHÔNG bật
+
+- **USART1** (PA9 / PB7): bootloader không nói chuyện với cảm biến. Để PA9, PB7 **chưa gán**.
+- Mọi ngắt CAN trong NVIC (`CAN RX0`, `CAN SCE`…): bootloader **thăm dò** FIFO. Mỗi ngắt bật lên là thêm một thứ phải gỡ trước khi nhảy sang ứng dụng.
+
+NVIC chỉ còn `Time base: System tick timer`.
+
+---
+
+## B3. Generate Code, rồi tự kiểm
+
+| # | Kiểm | Cách | Phải thấy |
+|---|---|---|---|
+| 1 | **SWD còn sống** | `grep -r SWJ_DISABLE VF_TempHumi_Bootloader/Core/Src/` | **không có kết quả** |
+| 2 | Clock | `SystemClock_Config()` trong `main.c` | `RCC_PLL_MUL9`, `RCC_HCLK_DIV2` — **giống từng dòng** với `Core/Src/main.c` của ứng dụng |
+| 3 | CAN | `can.c` | Prescaler `4`, BS1 `15`, BS2 `2`, SJW `1` |
+| 4 | **Ba GPIO** | `gpio.c` | `LED_DEBUG` **SET**, `EN_CAN1` **SET**, `ENA_RS485` **RESET**; ba nhãn trong `main.h` đúng chữ |
+| 5 | Không USART | `Core/Src/` | **không có** `usart.c` |
+| 6 | Không ngắt CAN | `HAL_CAN_MspInit` trong `can.c` | **không có** `HAL_NVIC_EnableIRQ` |
+
+---
+
+## B4. Linker script của bootloader — sửa tay, sau Generate
+
+Mở `VF_TempHumi_Bootloader/STM32F303K8TX_FLASH.ld`:
+
+```
+FLASH (rx) : ORIGIN = 0x8000000, LENGTH = 12K
+```
+
+Bản đồ flash chốt ở GĐ 4 (`app_config.h`):
+
+```
+0x08000000  bootloader   12 KB   <- project nay
+0x08003000  ung dung     50 KB
+0x0800F800  config        2 KB   (trang cuoi; trang F3 = 2 KB)
+```
+
+> ⚠️ **`ORIGIN` của ỨNG DỤNG chưa đổi ở bước này.** Ứng dụng chỉ dời sang `0x8003000` **cùng lúc** với lần nạp bootloader đầu tiên — quy trình test GĐ 5 sẽ ghi rõ bước đó. Dời sớm khi chip chưa có bootloader là board **không khởi động được**: lúc reset CPU đọc con trỏ stack và vector reset ở `0x08000000`, chỗ đó trắng (`0xFFFFFFFF`), và nó hard-fault ngay — không LED, không gì cả, giống hệt một board chết.
+
+`tools/check_linker.sh` (từ GĐ 4) sẽ được mở rộng để kiểm **cả hai** linker script: bootloader kết thúc ≤ `0x08003000`; ứng dụng bắt đầu ở `0x08003000` và kết thúc ≤ `0x0800F800`.
+
+---
+
+## B5. Mức tối ưu: `-Og`
+
+`Project → Properties → C/C++ Build → Settings → MCU GCC Compiler → Optimization → Optimization level = Optimize for debug (-Og)` — cho cấu hình **Debug**.
+
+Số đo của module rung (F103, cùng chức năng): `-O0` = 13 100 B — **tràn 12 KB**; `-Og` = 8 680 B. HAL của F303 lớn hơn F103 (riêng `HAL_RCC_OscConfig` đã 4 KB ở `-O0` trong ứng dụng này), nên `-O0` gần như chắc chắn tràn. Kích thước thật báo sau lần build đầu; nếu `-Og` vẫn sát trần, dự phòng là `-Os`.
+
+---
+
+## B6. Dùng chung code với ứng dụng — **link từng file, không chép**
+
+Ba file của ứng dụng được **link** vào bootloader:
+
+| File (`VF_TempHumi_Module/Core/Src/app/`) | Vì sao |
+|---|---|
+| `app_cfg.c` | định dạng config + phép kiểm. CAN2 §5 bất biến 5: bootloader dùng **đúng hàm** ứng dụng dùng |
+| `app_cfg_store.c` | đọc / ghi / xoá page config — `COMMIT` ghi bằng **đúng đường** ứng dụng đọc |
+| `app_board.c` | **`app_board_early_guard()`** — PB6 xuống thấp trước `HAL_Init`, đúng code đã đo ở GĐ 1 |
+
+**Cách link một file:** chuột phải `Core/Src` của **project bootloader** → `New → Folder`, tên `app` (nếu chưa có). Rồi chuột phải `Core/Src/app` → `New → File` → **`Advanced >>`** → ✓ **`Link to file in the file system`** → `Browse…` tới file trong `VF_TempHumi_Module/Core/Src/app/` → Finish. Làm ba lần.
+
+> **Đừng link cả thư mục.** Link từng file là danh sách trắng: đúng ba file sang. Link thư mục là danh sách đen — một file mới thêm bên ứng dụng sẽ tự lọt sang và gây `multiple definition`, hoặc kéo theo cả HAL UART.
+>
+> Ở module rung, bước này từng hỏng vì file được tạo **trên nhầm project**. Kiểm: trong Project Explorer ba file có **mũi tên nhỏ** trên icon, và nằm dưới `VF_TempHumi_Bootloader/Core/Src/app/`.
+
+**Include path** — `Project → Properties → C/C++ Build → Settings → MCU GCC Compiler → Include paths`, chọn **Configuration: [All configurations]**, thêm:
+
+```
+"${workspace_loc:/VF_TempHumi_Module/Core/Inc}"
+```
+
+Để nó **sau** `../Core/Inc`: `main.h` của **bootloader** phải được tìm thấy trước `main.h` của ứng dụng. Các header `app/app_*.h` chỉ có bên ứng dụng nên được tìm thấy ở đường thứ hai.
+
+> Claude sẽ tách `app_cfg_store.c` thành hai phần (đọc/ghi flash dùng chung; phần `g_diag` / LED / công tắc bench sang `app_cfg_boot.c` chỉ của ứng dụng) để bootloader không kéo theo `g_diag`, `app_fault`, `app_led`. Nếu bạn làm B6 trước khi Claude tách xong, build bootloader sẽ báo thiếu `g_diag` — bình thường, chưa cần sửa gì.
+
+---
+
+## B7. `makefile.init` của bootloader
+
+**Claude viết** `VF_TempHumi_Bootloader/makefile.init`: chạy `check_contracts.sh` và `check_linker.sh` của repo trước mỗi lần build bootloader. Bạn không làm gì ở bước này.
+
+---
+
+## B8. Build một lần, rồi báo cho Claude
+
+1. Chuột phải `VF_TempHumi_Bootloader` → **Refresh** → **Build Project**. Lỗi thiếu `boot_*` hay `g_diag` ở lần đầu là bình thường — code bootloader chưa được viết.
+2. Báo cho Claude: B3 đạt cả 6 mục; linker bootloader đã `LENGTH = 12K`; `-Og` đã đặt; ba file đã link; include path đã thêm cho **All configurations**.
+
+Claude kiểm lại tất cả từ file trên đĩa trước khi viết code.
