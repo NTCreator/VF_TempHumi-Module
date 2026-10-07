@@ -20,3 +20,6 @@ objects.list
 # OS junk
 Thumbs.db
 .DS_Store
+
+# Host test binaries
+tests/*.exe

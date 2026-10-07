@@ -37,20 +37,32 @@
 #error "Longest blink code exceeds APP_LED_DUTY_PCT_MAX - shorten it or lengthen the gap"
 #endif
 
+#if (APP_LED_MEAS_ON_MS * 100u) > (APP_LED_DUTY_PCT_MAX * APP_LED_MEAS_PERIOD_MS)
+#error "Measuring pattern duty cycle above APP_LED_DUTY_PCT_MAX"
+#endif
+#if APP_LED_MEAS_ON_MS >= APP_LED_MEAS_PERIOD_MS
+#error "Measuring pattern on-time must be shorter than its period"
+#endif
+
 #define LED_BOOT_OFF_MS (APP_LED_BOOT_PERIOD_MS - APP_LED_BOOT_ON_MS)
+#define LED_MEAS_OFF_MS (APP_LED_MEAS_PERIOD_MS - APP_LED_MEAS_ON_MS)
 
 static uint32_t s_phase_start_ms;
 static uint32_t s_phase_len_ms;
 static bool     s_is_on;
 
-/* 0 means the boot pattern. Anything else is a blink code. */
+/* The code being drawn: 0 means the quiet pattern (boot or measuring). */
 static uint8_t  s_code;
 static uint8_t  s_blinks_left;
 
 /* Written by app_led_show_code(), which may run in an ISR; consumed by
    app_led_task() in the super-loop. One byte, one store: no critical section
-   needed. */
+   needed. Latched: nothing clears it but app_led_init(). */
 static volatile uint8_t s_pending_code;
+
+/* Live status code and quiet-pattern choice. Written by the super-loop only. */
+static uint8_t  s_status_code;
+static bool     s_measuring;
 
 static void led_enter_phase(bool on, uint32_t len_ms, uint32_t now_ms)
 {
@@ -70,6 +82,8 @@ void app_led_init(uint32_t now_ms)
   s_code = 0u;
   s_blinks_left = 0u;
   s_pending_code = 0u;
+  s_status_code = 0u;
+  s_measuring = false;
   led_enter_phase(false, LED_BOOT_OFF_MS, now_ms);
 }
 
@@ -82,16 +96,31 @@ void app_led_show_code(uint8_t blinks)
   s_pending_code = led_clamp_code(blinks);
 }
 
+void app_led_set_status(uint8_t blinks)
+{
+  s_status_code = led_clamp_code(blinks);
+}
+
+void app_led_set_measuring(bool measuring)
+{
+  /* Takes effect at the next phase change of the pattern: no half flash. */
+  s_measuring = measuring;
+}
+
 void app_led_task(uint32_t now_ms)
 {
-  const uint8_t pending = s_pending_code;
-  if ((pending != 0u) && (pending != s_code))
+  /* A latched fault beats a live status; either beats the quiet pattern. */
+  const uint8_t fault = s_pending_code;
+  const uint8_t want  = (fault != 0u) ? fault : s_status_code;
+
+  if (want != s_code)
   {
-    /* Start the new code from its pause, so the first group a human sees is a
-       whole group and not the tail of one. */
-    s_code = pending;
-    s_blinks_left = pending;
-    led_enter_phase(false, APP_LED_CODE_GAP_MS, now_ms);
+    /* Start a new code from its pause, so the first group a human sees is a
+       whole group and not the tail of one. Leaving a code starts the quiet
+       pattern dark, for the same reason. */
+    s_code = want;
+    s_blinks_left = want;
+    led_enter_phase(false, (want != 0u) ? APP_LED_CODE_GAP_MS : LED_BOOT_OFF_MS, now_ms);
     return;
   }
 
@@ -104,7 +133,9 @@ void app_led_task(uint32_t now_ms)
 
   if (s_code == 0u)
   {
-    led_enter_phase(!s_is_on, s_is_on ? LED_BOOT_OFF_MS : APP_LED_BOOT_ON_MS, now_ms);
+    const uint32_t on_ms  = s_measuring ? APP_LED_MEAS_ON_MS : APP_LED_BOOT_ON_MS;
+    const uint32_t off_ms = s_measuring ? LED_MEAS_OFF_MS : LED_BOOT_OFF_MS;
+    led_enter_phase(!s_is_on, s_is_on ? off_ms : on_ms, now_ms);
     return;
   }
 

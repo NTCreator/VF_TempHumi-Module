@@ -15,8 +15,10 @@
    main.h, so a pin move in the .ioc follows through here without an edit. */
 
 /* MAX485 DE and /RE are tied together on ENA_RS485: HIGH = driver on
-   (transmit), LOW = receiver on. R8/R9 pull the line to +5 V, so "receive" is
-   the state firmware has to fight for. PB6 is five-volt tolerant. */
+   (transmit), LOW = receiver on (MAX481.PDF p.10, Function Tables 1 and 2).
+   R8/R9 pull the line to +5 V, so "receive" is the state firmware has to
+   fight for - measured in phase 1: 5 V in reset, 0 V running. PB6 is
+   five-volt tolerant. */
 #define BOARD_RS485_RECEIVE     GPIO_PIN_RESET
 
 /* TJA1044 STB via R2: LOW = Normal, HIGH = Standby (CLAUDE.md 4.1). Naming the
@@ -63,6 +65,11 @@ void app_board_enter_safe_state(void)
   HAL_GPIO_WritePin(ENA_RS485_GPIO_Port, ENA_RS485_Pin, BOARD_RS485_RECEIVE);
   HAL_GPIO_WritePin(EN_CAN1_GPIO_Port, EN_CAN1_Pin, BOARD_CAN_STB_STANDBY);
   HAL_GPIO_WritePin(LED_DEBUG_GPIO_Port, LED_DEBUG_Pin, BOARD_LED_DARK);
+}
+
+void app_board_rs485_release(void)
+{
+  HAL_GPIO_WritePin(ENA_RS485_GPIO_Port, ENA_RS485_Pin, BOARD_RS485_RECEIVE);
 }
 
 void app_board_led_set(bool on)

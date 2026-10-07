@@ -16,11 +16,12 @@
   *                   unconfigured module must never reach Normal: a duplicate
   *                   node_id takes the whole CAN1 bus down (CLAUDE.md 1.2).
   *
-  * Deliberately missing, for now: a call that puts the transceiver in Normal
-  * (phase 4, and it will demand a CRC-checked config as its argument) and a
-  * call that raises DE to transmit (phase 2, inside the Modbus driver, paired
-  * with the TC wait of docs/VF_TH_IOC_Guide.md A8). A function that does not
-  * exist cannot be called by mistake.
+  * Deliberately missing: a call that puts the transceiver in Normal (phase 4,
+  * and it will demand a CRC-checked config as its argument), and any exported
+  * call that raises DE. Raising DE lives in drv_rs485.c as a static function,
+  * paired with the transmit-complete interrupt that drops it again
+  * (docs/VF_TH_IOC_Guide.md A8). A function that does not exist cannot be
+  * called by mistake. Releasing the bus is always safe, so that one is here.
   ******************************************************************************
   */
 #ifndef APP_APP_BOARD_H
@@ -52,6 +53,14 @@ void app_board_early_guard(void);
   * context, a fault handler included.
   */
 void app_board_enter_safe_state(void);
+
+/**
+  * @brief MAX485 to receive: PB6 low, driver off, bus released.
+  *
+  * Always safe, from any context - drv_rs485 calls it from the UART
+  * interrupt the moment the last stop bit has left the wire.
+  */
+void app_board_rs485_release(void);
 
 /**
   * @brief Drive the L2 status LED on PB0. true = lit.

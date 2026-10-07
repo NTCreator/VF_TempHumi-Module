@@ -26,8 +26,10 @@
 /* USER CODE BEGIN Includes */
 #include "app/app_board.h"
 #include "app/app_config.h"
+#include "app/app_diag.h"
 #include "app/app_fault.h"
 #include "app/app_led.h"
+#include "app/app_th.h"
 
 /* USER CODE END Includes */
 
@@ -115,10 +117,9 @@ int main(void)
          on the measurement bus. A duplicate node_id takes the bus down, it
          does not just make the log messy (CLAUDE.md 1.2).
 
-     Phase 1 stops here on purpose: CAN and USART1 are initialised by the
-     generated code but nothing uses them. CAN in particular is never started,
-     so the controller stays in init mode (CANTX recessive) behind a
-     transceiver in standby - silent on CAN1 twice over. */
+     CAN is initialised by the generated code but never started (phase 3), so
+     the controller stays in init mode (CANTX recessive) behind a transceiver
+     in standby - silent on CAN1 twice over. */
   app_board_enter_safe_state();
 
   /* Nothing reads s_fw_id, so --gc-sections would drop it, and this
@@ -127,7 +128,11 @@ int main(void)
      one load, no other effect. */
   __asm__ volatile ("" : : "r" (s_fw_id));
 
+  /* g_diag first (the others fill it), the LED before anything that can
+     raise a fault (its init clears pending codes). */
+  app_diag_init();
   app_led_init(HAL_GetTick());
+  app_th_init(HAL_GetTick());
 
   /* USER CODE END 2 */
 
@@ -140,10 +145,11 @@ int main(void)
     /* USER CODE BEGIN 3 */
     /* Bare-metal super-loop (CLAUDE.md 6.3), paced by the 1 ms SysTick. Every
        periodic job is a task that takes the tick, does its work and returns.
-       Nothing here may block: from phase 2 on this loop also runs the Modbus
-       transaction, and every wait in it is bounded. */
+       Nothing here may block: the Modbus transaction is a state machine that
+       the loop advances, and every wait in it is bounded and counted. */
     const uint32_t now_ms = HAL_GetTick();
 
+    app_th_task(now_ms);
     app_led_task(now_ms);
   }
   /* USER CODE END 3 */

@@ -1,6 +1,6 @@
 # Giai đoạn 2 — Kế hoạch: driver RS485 + Modbus RTU
 
-**Trạng thái: CHỜ DUYỆT** (2026-10-07). Chưa viết dòng code nào. Ba câu hỏi ở mục 12.
+**Trạng thái: ĐÃ DUYỆT 2026-10-07** — cả ba câu hỏi ở mục 12 theo **phương án A**. Dụng cụ test: oscilloscope; nhiệt độ so tương đối với cảm biến phòng lab, không có ẩm kế tham chiếu.
 
 | | |
 |---|---|

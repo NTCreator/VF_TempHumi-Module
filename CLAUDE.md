@@ -76,6 +76,7 @@ Khi viết một hằng số lấy từ datasheet, **ghi nguồn trong comment**
   Đường dẫn Windows `C:/...` làm hỏng PATH (bị tách ở dấu `:`). Chỉ dùng dạng MSYS.
 - **`Debug/makefile` do CubeIDE sinh và chỉ biết những file `.c` có lúc IDE build lần cuối.** Thêm file nguồn hay thư mục mới ⇒ người dùng làm **Refresh (F5) rồi Project → Build Project** một lần trong IDE; sau đó `make` headless mới thấy file đó. IDE thường đang mở nên workspace bị khoá — không chạy `headless-build` được. `Debug/` nằm trong `.gitignore`.
 - **`check_contracts` chạy ở đầu mọi lần `make`** qua `makefile.init` ở gốc repo (hook CDT: `Debug/makefile` mở đầu bằng `-include ../makefile.init`). `make clean` không bị chặn. `.gitattributes` ghim LF cho `contracts/*` — thiếu nó thì một clone mới lệch cả bốn hash.
+- **Test host** (từ phase 2): `gcc` 6.3 của MinGW có trong PATH (`/c/MinGW/bin`), `make` thì không — dùng `make` của CubeIDE (`M=` ở trên): `cd tests && PATH="/c/MinGW/bin:$M:$PATH" make`. Cờ `-Wall -Wextra -Werror -Wconversion -Wdouble-promotion`. Module thuần (`drv_modbus`, `app_meas`) không include HAL để test được ở đây.
 - Toolchain ST 14.3 bỏ qua `__attribute__((retain))`. Muốn giữ một hằng không ai tham chiếu qua `--gc-sections`, cho nó một tham chiếu thật — xem `s_fw_id` trong `main.c`.
 
 ## 4. Phần cứng
@@ -204,7 +205,7 @@ STM32F303K8T6 **có FPU đơn chính xác**. Dùng `float` thoải mái, **khôn
 |---|---|---|
 | **0** | **Hợp đồng**: proposal, DBC v1.5, ID Map v1.3, CAN2 v1.5 | **ĐÃ DUYỆT 2026-10-05**, phương án A — `docs/VF_TH_CAN_Proposal.md` |
 | **1** | Khung project, `app_config.h`, LED, im lặng trên CAN, `check_contracts` | **XONG 2026-10-07.** Build 0/0, `check_contracts` đã chứng minh fail được. Test board đạt: R8/R9 có lắp thật (PB6 = 5 V khi reset) **và firmware thắng được chúng (PB6 = 0 V khi chạy)**; im lặng trên CAN1 cả phát lẫn ACK; chip K8. Báo cáo `docs/VF_TH_Phase1_Report.md` §8 |
-| 2 | Driver RS485 + Modbus RTU, đọc được nhiệt độ/độ ẩm | chưa làm |
+| **2** | Driver RS485 + Modbus RTU, đọc được nhiệt độ/độ ẩm | **code + build xong 2026-10-07** (0/0, test host 362/362, 5 đột biến đều bị bắt). **Chờ test board** — `docs/VF_TH_Phase2_Test.md`; báo cáo `docs/VF_TH_Phase2_Report.md` |
 | 3 | Phát `TH_Data` + `TH_Status` lên CAN1 (silent loopback trước) | chưa làm |
 | 4 | Kho config trong flash + phát thật trên bus | chưa làm |
 | 5 | Bootloader + giao thức CAN2 | chưa làm |
@@ -217,9 +218,16 @@ STM32F303K8T6 **có FPU đơn chính xác**. Dùng `float` thoải mái, **khôn
 | Điều | Chốt | Ở đâu |
 |---|---|---|
 | Thứ tự khởi động | `app_board_early_guard()` ở `USER CODE 1`, **trước `HAL_Init`**: PB6 LOW rồi PA10 HIGH. B3 lặp lại ở `USER CODE 2` qua `app_board_enter_safe_state()` | `main.c`, `app_board.c` |
-| Hàm bị cấm cho tới khi có lý do | Không có hàm đưa transceiver sang Normal (phase 4, sẽ đòi config đã kiểm CRC làm tham số) và không có hàm bật DE (phase 2, nằm trong driver Modbus, đi cùng phép chờ TC) | `app_board.h` |
-| LED | Khởi động 50 ms / 500 ms (10%). Mã N: 50 ms sáng, 250 ms tắt, nghỉ 2000 ms, tối đa 8. Duty kiểm ở thì biên dịch. **Cùng ngôn ngữ với module góc** | `app_config.h`, `app_led.c` |
-| Mã lỗi | `APP_FAULT_NONE/HAL_INIT` = 0/1. Mã đầu tiên được chốt, mã sau chỉ đếm. Số = số lần nháy. Dự kiến 2 = cảm biến không trả lời, 3 = config sai CRC (trùng module góc). Chỉ thêm vào cuối | `app_fault.h` |
+| Hàm bị cấm cho tới khi có lý do | Không có hàm đưa transceiver sang Normal (phase 4, sẽ đòi config đã kiểm CRC làm tham số). **Không có hàm export nào bật DE**: `rs485_drive_bus()` là `static` trong `drv_rs485.c`; nhả bus thì export (`app_board_rs485_release`) vì luôn an toàn | `app_board.h`, `drv_rs485.c` |
+| LED | Khởi động 50 ms / 500 ms (10%). **Đang đo 50 ms / 5000 ms (1%)** khi số đo tươi. Mã N: 50 ms sáng, 250 ms tắt, nghỉ 2000 ms, tối đa 8. Mã lỗi **chốt** thắng mã **trạng thái sống**, cả hai thắng mẫu yên. Duty kiểm ở thì biên dịch. **Cùng ngôn ngữ với module góc** | `app_config.h`, `app_led.c` |
+| Mã lỗi | `APP_FAULT_NONE/HAL_INIT/SENSOR` = 0/1/2. Mã 1 **chốt** (`app_fault_raise`, mã đầu tiên được giữ). **Mã 2 KHÔNG chốt** — trạng thái sống do `app_th` đặt qua `app_led_set_status`, không bao giờ truyền vào `app_fault_raise` (GĐ 2, câu hỏi 1, A). Dự kiến 3 = config sai CRC (trùng module góc). Số = số lần nháy. Chỉ thêm vào cuối | `app_fault.h` |
+| DE (GĐ 2) | Bật nhận **trước** khi phát; DE lên ngay trước `HAL_UART_Transmit_IT`; **DE xuống trong `HAL_UART_TxCpltCallback`** (= cờ TC, sau bit stop). TC không tới trong 50 ms ⇒ hạ cưỡng bức, đếm `MB_ERR_TX`. Lỗi UART ⇒ hạ ngay trong ngắt | `drv_rs485.c` |
+| Giao dịch Modbus (GĐ 2) | Một lần đọc 2 thanh ghi từ `0x0000` (RH rồi T, datasheet tr. 7), mỗi 2 s, lần đầu sau 2 s. Kết thúc khung theo `expected_len` hoặc lặng > 8 ms; không byte nào trong 200 ms ⇒ TIMEOUT. **Không dựa vào RTO phần cứng.** Mọi lối ra qua `th_finish` ⇒ **đúng một** bộ đếm | `app_th.c` |
+| Tuổi số đo (GĐ 2) | Từ reply **hợp lệ** cuối; 0,1 s; `0xFFFF` = chưa đọc; bão hoà `0xFFFE`. **STALE ⇔ `DataAge` > 60** (xét trên con số được phát, để log tự nhất quán: 6099 ms tươi, 6100 ms STALE). NEVER_READ không kéo theo STALE | `app_meas.c` |
+| Số ngoài dải (GĐ 2) | Giữ số, bật `RANGE`, tuổi về 0 (câu hỏi 3, A) | `app_meas.c` |
+| Quét chẩn đoán (GĐ 2) | Một lần mỗi lần khởi động, sau 5 lần hỏi không có số hợp lệ: 4800 / 9600 / 2400 × `0xFF` đọc `0x07D0`. **Chỉ báo vào `g_diag.th.scan`, không bao giờ chấp nhận, quay về 4800** (câu hỏi 2, A) | `app_th.c` |
+| Không ghi cảm biến | Firmware **chỉ đọc**, mãi mãi. `drv_modbus` chỉ có hàm 0x03 | `drv_modbus.h` |
+| Console | `g_diag` (magic `THD1` = `0x54484431`) đọc bằng Live Expressions. `g_diag.th.count[]` đánh số theo `mb_status_t` | `app_diag.h`, `app_th.h` |
 | `Error_Handler` | Lấy LR → tắt ngắt → `MX_GPIO_Init()` lại → `app_fault_fatal(HAL_INIT, LR)` → nháy mã 1 bằng polling `SysTick COUNTFLAG` | `main.c` |
 | HardFault | về trạng thái an toàn (RS485 nhả, transceiver Standby, LED tắt) rồi treo | `stm32f3xx_it.c` |
 | Tên firmware | `s_fw_id` trong image (không có console). Bump `APP_FW_PHASE` mỗi phase | `main.c`, `app_config.h` |

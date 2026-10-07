@@ -21,7 +21,7 @@
    wired to the sensor, not out of the board. "Printed at boot" therefore means
    embedded in the image, where a debugger or `strings` on the .elf finds it -
    see s_fw_id in main.c. */
-#define APP_FW_PHASE              "1"      /* bump each phase */
+#define APP_FW_PHASE              "2"      /* bump each phase */
 #define APP_FW_VERSION            1u       /* TH_Status byte 0, FwVersion (proposal 5.2) */
 
 /* ---- Memory - STM32F303K8T6 -------------------------------------- */
@@ -88,6 +88,20 @@
 #define SHT_TEMP_MAX_X10          600      /* p.1 "Moi truong lam viec": +60 C */
 #define SHT_RH_MIN_X10            0        /* p.1 "Moi truong lam viec": 0 %RH */
 #define SHT_RH_MAX_X10            1000     /* p.1 "Moi truong lam viec": 100 %RH */
+/* p.7 "Vd: doc Nhiet do & Do am": one request reads both registers, humidity
+ * first. Temperature below 0 C is two's complement (0xFF33 = -20.5 C). One
+ * transaction gives two numbers taken at the same moment. */
+#define SHT_READ_FIRST_REG        SHT_REG_HUMIDITY
+#define SHT_READ_COUNT            2u
+#define SHT_REG_ADDRESS           0x07D0u  /* p.6 "Bang thanh ghi": sensor address, R/W */
+/* p.9 "De doc gia tri Dia chi": a read of 0x07D0 sent to address 0xFF is
+ * answered by every sensor on the line, with its own address. Used by the
+ * diagnostic scan only. */
+#define SHT_ADDR_ANY              0xFFu
+/* p.4 "Giao thuc truyen thong": the sensor can be set to 2400, 4800 or 9600.
+ * The scan tries the factory default first. */
+#define SHT_BAUD_ALT_1            9600u
+#define SHT_BAUD_ALT_2            2400u
 
 /* ---- Modbus RTU framing at 4800 8N1 ------------------------------ */
 /* p.4 "Giao thuc truyen thong": 8 data bits, 1 stop bit, no parity. With the
@@ -103,9 +117,58 @@
 #define MB_REPLY_TIMEOUT_MS       200u
 #define MB_POLL_PERIOD_MS         SHT_REFRESH_MS            /* faster is pointless */
 
+/* Frame sizes for function 0x03 (read holding registers). */
+#define MB_READ_REQ_LEN           8u   /* addr, func, reg hi/lo, count hi/lo, crc lo/hi */
+#define MB_READ_MAX_REGS          2u   /* the most this firmware ever asks for */
+#define MB_EXCEPTION_LEN          5u   /* addr, func | 0x80, code, crc lo/hi */
+#define MB_FRAME_MIN_LEN          MB_EXCEPTION_LEN
+/* Receive buffer: larger than any reply this firmware accepts (9 bytes), so a
+ * longer burst is seen and counted instead of silently clipped. */
+#define MB_RX_BUF_LEN             16u
+/* Request is 8 characters = 16.7 ms on the wire. If the transmit-complete
+ * interrupt has not come by this time, something is wrong and DE is dropped
+ * by force: otherwise this module would hold the RS485 bus itself. */
+#define MB_TX_TIMEOUT_MS          50u
+/* Silence that ends a frame early: 3.5 characters is 7.29 ms, rounded up to
+ * the 1 ms tick. Between two bytes of one frame the line is quiet for at most
+ * 1.5 characters (Modbus RTU), so this never splits a good frame. */
+#define MB_GAP_MS                 8u
+/* First poll one refresh period after boot: the sensor runs from its own
+ * 12 V supply and the datasheet gives no start-up time. Polling at t = 0
+ * would count a timeout on every boot for no fault at all. */
+#define MB_FIRST_POLL_MS          SHT_REFRESH_MS
+
 /* ---- Age of the measurement -------------------------------------- */
 /* Proposal 5.1, Flags bit 3 STALE: DataAge above 3 sensor refresh periods. */
 #define APP_TH_STALE_MS           6000u
+
+/* Proposal 5.1: DataAge counts 0.1 s from the last valid Modbus reply.
+ * 0xFFFF means "never read since boot". A very old reading saturates one
+ * below that, so it can never be mistaken for "never read". */
+#define APP_TH_AGE_LSB_MS         100u
+#define APP_TH_AGE_NEVER          0xFFFFu
+#define APP_TH_AGE_MAX            0xFFFEu
+
+/* Proposal 5.1, TH_Data / TH_Status Flags byte. */
+#define TH_FLAG_NEVER_READ        0x01u    /* bit 0: no valid read since boot */
+#define TH_FLAG_TIMEOUT           0x02u    /* bit 1: last transaction got no reply */
+#define TH_FLAG_CRC_ERR           0x04u    /* bit 2: last reply had a bad CRC */
+#define TH_FLAG_STALE             0x08u    /* bit 3: read before, but DataAge > APP_TH_STALE_MS */
+#define TH_FLAG_RANGE             0x10u    /* bit 4: last valid reading outside the datasheet range */
+#define TH_FLAG_BUS_OFF_SEEN      0x20u    /* bit 5: CAN bus-off seen (phase 3+) */
+
+/* LED code 2 "sensor not answering" (phase 2 plan, question 1, option A):
+ * a LIVE status, not a latched fault. Shown when nothing valid has been read
+ * this long after boot, or when the reading is STALE; it goes away by itself
+ * when readings come back. The sensor sits on a plug-in cable and its own
+ * 12 V supply, so a late or re-plugged sensor is normal during installation. */
+#define APP_TH_SILENT_LED_MS      10000u
+
+/* Diagnostic scan (phase 2 plan, question 2, option A): after this many
+ * transactions without a single valid read, once per boot, ask address 0xFF
+ * at each baud rate. Report only - never adopt what it finds, never write. */
+#define APP_TH_SCAN_AFTER_TRIES   5u
+#define APP_TH_SCAN_BAUDS         3u
 
 /* ---- LED (L2 on PB0) --------------------------------------------- */
 /* L2 (red 0805) hangs from +3V3 through R5 = 330 ohm into PB0 (netlist): the
@@ -120,6 +183,11 @@
  * every module type the same way. */
 #define APP_LED_BOOT_ON_MS        50u
 #define APP_LED_BOOT_PERIOD_MS    500u
+
+/* Measuring pattern (phase 2 on): one flash every 5 s, 1%, while the reading
+ * is fresh. Same numbers as VF_Angle_Module's measuring pattern. */
+#define APP_LED_MEAS_ON_MS        50u
+#define APP_LED_MEAS_PERIOD_MS    5000u
 
 /* Fault code N: N flashes APP_LED_CODE_ON_MS long, APP_LED_CODE_OFF_MS apart,
  * then APP_LED_CODE_GAP_MS dark before the group repeats. One period is
@@ -154,6 +222,11 @@ _Static_assert(MB_CHAR_US == (MB_BITS_PER_CHAR * 1000000u) / SHT_BAUD_DEFAULT,
 _Static_assert(MB_POLL_PERIOD_MS >= SHT_REFRESH_MS, "polling faster than the sensor refreshes reads old numbers");
 _Static_assert(MB_REPLY_TIMEOUT_MS < MB_POLL_PERIOD_MS, "a transaction must end before the next one is due");
 _Static_assert(APP_TH_STALE_MS == 3u * SHT_REFRESH_MS, "proposal 5.1: STALE = 3 refresh periods");
+_Static_assert(MB_GAP_MS * 1000u >= MB_SILENCE_US, "frame-end silence shorter than 3.5 characters");
+_Static_assert(MB_TX_TIMEOUT_MS * 1000u > MB_READ_REQ_LEN * MB_CHAR_US, "TX timeout shorter than the request itself");
+_Static_assert(MB_RX_BUF_LEN > 3u + 2u * MB_READ_MAX_REGS + 2u, "RX buffer must exceed the longest accepted reply");
+_Static_assert(APP_TH_AGE_MAX < APP_TH_AGE_NEVER, "a saturated age must never read as 'never read'");
+_Static_assert(APP_TH_SILENT_LED_MS > MB_FIRST_POLL_MS, "LED code 2 must not show before the first poll");
 
 /* The application must already fit the region it will move to in phase 5. */
 _Static_assert(APP_APP_FLASH_KB == 52u, "IOC guide A9: 64 KB - 12 KB bootloader");

@@ -3,19 +3,22 @@
   * @file    app_led.h
   * @brief   The PB0 LED (L2), as the board's only voice before CAN exists.
   *
-  * Two things it can say:
-  *   boot   - an even 2 Hz flash: firmware is running, nothing has failed,
-  *            the module is not measuring yet;
-  *   code N - N flashes, a long pause, repeat: a fault is latched and N says
-  *            which one (app_fault.h).
+  * What it can say, strongest first:
+  *   fault code N  - N flashes, a long pause, repeat: a fault is LATCHED
+  *                   (app_fault.h) and stays until reset;
+  *   status code N - same pattern, but LIVE: shown while a condition holds and
+  *                   gone when it clears (phase 2: code 2, sensor silent);
+  *   measuring     - one flash every 5 s: the reading is fresh;
+  *   boot          - an even 2 Hz flash: running, nothing measured yet.
   *
-  * Same language as VF_Angle_Module. Every pattern stays at or below
-  * APP_LED_DUTY_PCT_MAX, checked at compile time (CLAUDE.md 6.5).
+  * Same patterns and numbers as VF_Angle_Module. Every pattern stays at or
+  * below APP_LED_DUTY_PCT_MAX, checked at compile time (CLAUDE.md 6.5).
   ******************************************************************************
   */
 #ifndef APP_APP_LED_H
 #define APP_APP_LED_H
 
+#include <stdbool.h>
 #include <stdint.h>
 
 /**
@@ -27,19 +30,30 @@
 void app_led_init(uint32_t now_ms);
 
 /**
-  * @brief Switch to a blink code. Takes effect on the next app_led_task().
+  * @brief Latch a fault code. Takes effect on the next app_led_task().
   *
   * Safe from an ISR: it writes one byte and returns. 0 is ignored. Values above
   * APP_LED_CODE_MAX are clamped, because a longer code would push the duty
-  * cycle past the ceiling.
+  * cycle past the ceiling. Only app_fault should call this.
   */
 void app_led_show_code(uint8_t blinks);
 
 /**
+  * @brief Set the live status code; 0 clears it. A latched fault code always
+  *        wins over it. Call from the super-loop, as often as convenient.
+  */
+void app_led_set_status(uint8_t blinks);
+
+/**
+  * @brief Switch the quiet pattern: boot (2 Hz) or measuring (one flash every
+  *        5 s). Codes, latched or live, always win over both.
+  */
+void app_led_set_measuring(bool measuring);
+
+/**
   * @brief Advance the pattern. Call on every pass of the super-loop.
   *
-  * Returns immediately, always: it never delays and never waits. From phase 2
-  * on the same loop services the Modbus receiver.
+  * Returns immediately, always: it never delays and never waits.
   *
   * @param now_ms current HAL_GetTick() value
   */
