@@ -110,7 +110,7 @@ Suy ra từ netlist bằng cách neo vào bảy điểm chắc chắn (VDD pin 1
 
 **Module cần HAI nguồn:** +5 V từ harness CAN1 (qua D1 → LDO RT9193 → 3V3), và **+12 V riêng qua JP2** cho cảm biến. Cảm biến chịu 5–28 VDC nhưng board đưa 12 V tới J1.
 
-**`GND12` KHÔNG nối với `GND` trên board** (netlist: net `GND12` chỉ có J1-3, JP2-7, JP2-8; sơ đồ dùng hai ký hiệu đất riêng; không có net-tie). MAX485 không cách ly, nên RS485 chỉ có chế độ chung đúng khi **âm hai nguồn được nối với nhau bên ngoài board**. Ở bàn test: nối âm 12 V với âm 5 V. Harness trên xe có làm vậy không — **chưa biết** (phát hiện ở phase 1, 2026-10-05).
+**`GND12` KHÔNG nối với `GND` trên board** (netlist: net `GND12` chỉ có J1-3, JP2-7, JP2-8; sơ đồ dùng hai ký hiệu đất riêng; không có net-tie). MAX485 không cách ly, nên RS485 chỉ có chế độ chung đúng khi **âm hai nguồn được nối với nhau bên ngoài board**. Ở bàn test: nối âm 12 V với âm 5 V. Hệ thống là **data logger độc lập, không liên quan tới xe** (người dùng, 2026-10-07). Việc còn mở: trong hệ data logger, nguồn 12 V cho JP2 và nguồn 5 V của harness CAN1 có chung âm không — **cần biết trước khi lắp đặt thật, không chặn phase 2** (phase 2 chạy trên bàn test, âm đã nối chung).
 
 **JP2 không có NRST** — SWD là đường debug duy nhất qua header, giống `VF_Main`. Nhưng board **có SW1** nên vẫn reset tay được.
 
@@ -203,7 +203,7 @@ STM32F303K8T6 **có FPU đơn chính xác**. Dùng `float` thoải mái, **khôn
 | GĐ | Nội dung | Trạng thái |
 |---|---|---|
 | **0** | **Hợp đồng**: proposal, DBC v1.5, ID Map v1.3, CAN2 v1.5 | **ĐÃ DUYỆT 2026-10-05**, phương án A — `docs/VF_TH_CAN_Proposal.md` |
-| **1** | Khung project, `app_config.h`, LED, im lặng trên CAN, `check_contracts` | **code + build xong 2026-10-05** (0/0, `check_contracts` đã chứng minh fail được). **Test board 2026-10-07: mọi bài đã báo đều đạt** (R8/R9 có lắp thật; im lặng trên CAN1 cả phát lẫn ACK; chip K8). **Còn thiếu bài 5 — PB6 ≈ 0 V khi firmware chạy (B6 #1)**. Báo cáo `docs/VF_TH_Phase1_Report.md` §8 |
+| **1** | Khung project, `app_config.h`, LED, im lặng trên CAN, `check_contracts` | **XONG 2026-10-07.** Build 0/0, `check_contracts` đã chứng minh fail được. Test board đạt: R8/R9 có lắp thật (PB6 = 5 V khi reset) **và firmware thắng được chúng (PB6 = 0 V khi chạy)**; im lặng trên CAN1 cả phát lẫn ACK; chip K8. Báo cáo `docs/VF_TH_Phase1_Report.md` §8 |
 | 2 | Driver RS485 + Modbus RTU, đọc được nhiệt độ/độ ẩm | chưa làm |
 | 3 | Phát `TH_Data` + `TH_Status` lên CAN1 (silent loopback trước) | chưa làm |
 | 4 | Kho config trong flash + phát thật trên bus | chưa làm |
@@ -227,7 +227,7 @@ STM32F303K8T6 **có FPU đơn chính xác**. Dùng `float` thoải mái, **khôn
 
 ### 7.2 Sự thật phát hiện ở phase 1, không nằm ở chỗ khác
 
-- **`GND12` không nối với `GND` trên board** — xem §4.2. Chưa biết harness trên xe có chung âm không: **phải trả lời trước phase 2**.
+- **`GND12` không nối với `GND` trên board** — xem §4.2. Hệ data logger độc lập: nguồn 12 V và nguồn 5 V có chung âm không — cần biết trước khi lắp đặt thật.
 - **`VF_Main` không có bản nào của `VF_TH_CAN_Proposal.md`** (module góc thì có, ở `VF_Main/docs/VF_Angle/`). Bản gốc thực tế là `docs/` của repo này — nằm ngoài vùng `check_contracts` canh.
 - Hai lỗi chữ trong hợp đồng, không ảnh hưởng firmware: proposal §5.3 ghi `0x040 + node_id` (đúng: `0x010 + node_id`); CAN2 v1.5 bảng §4.1 vẫn ghi `0x03` *chưa đặt tên*. Ghi ở `contracts/README.md`.
 - `USART1` trên F303x8 lấy clock từ **PCLK1 = 36 MHz** (`RCC_USART1CLKSOURCE_PCLK1` trong `SystemClock_Config`), không phải PCLK2.

@@ -32,7 +32,7 @@ Mỗi bài có cột "Nếu khác". Board thật khác netlist thì **ghi lại 
 
 > ⚠️ **`GND12` KHÔNG nối với `GND` ở bất kỳ đâu trên board** (netlist: net `GND12` chỉ có J1-3, JP2-7, JP2-8; sơ đồ nguyên lý dùng hai ký hiệu đất riêng). Tín hiệu RS485 A/B của cảm biến tham chiếu `GND12`, còn MAX485 tham chiếu `GND`.
 >
-> **Ở bàn test: nối âm của nguồn 12 V với âm của nguồn 5 V** (hoặc dùng một nguồn hai đầu ra chung âm). Hai nguồn cách ly thả nổi nhau thì giai đoạn 2 có thể đọc được hoặc không, tuỳ may rủi. Ghi lại: **harness thật trên xe có chung âm hai nguồn không?**
+> **Ở bàn test: nối âm của nguồn 12 V với âm của nguồn 5 V** (hoặc dùng một nguồn hai đầu ra chung âm). Hai nguồn cách ly thả nổi nhau thì giai đoạn 2 có thể đọc được hoặc không, tuỳ may rủi. Ghi lại: **trong hệ data logger, nguồn 12 V và nguồn 5 V có chung âm không?**
 
 ### 1.3 ST-Link vào JP2 — và cái bẫy 12 V ngay cạnh SWD
 
@@ -102,7 +102,7 @@ Mỗi bài có cột "Nếu khác". Board thật khác netlist thì **ghi lại 
 | 8c | |
 | 9 | |
 | — | +5 V: ___ mA · +12 V có cảm biến: ___ mA |
-| — | Harness thật trên xe có chung âm 5 V / 12 V không? ________ |
+| — | Trong hệ data logger, nguồn 12 V và 5 V có chung âm không? ________ |
 
 ---
 

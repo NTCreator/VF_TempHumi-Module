@@ -1,6 +1,6 @@
 # Giai đoạn 1 — Báo cáo
 
-**Trạng thái: CODE + BUILD XONG 2026-10-05. Test board 2026-10-07: mọi bài bắt buộc đã báo đều đạt — CÒN THIẾU bài 5 (PB6 khi firmware đang chạy), tức B6 #1.** Kết quả ở mục 8.
+**Trạng thái: XONG 2026-10-07** — build sạch 2026-10-05, test board đạt mọi bài bắt buộc 2026-10-07 (mục 8).
 
 Khung project chạy bare-metal: nhả bus RS485 trước mọi thứ, im lặng trên CAN1, báo hiệu bằng LED L2. Giai đoạn này không nói chuyện với cảm biến, không phát CAN, không có bootloader — đúng phạm vi `docs/VF_TH_Phase1_Prompt.md`.
 
@@ -187,8 +187,8 @@ Chuỗi sâu nhất trong code ứng dụng là đường fatal: `Error_Handler`
 
 ## 7. Vấn đề còn mở
 
-1. **Chưa test trên board.** Chờ bảng kết quả.
-2. **`GND12` KHÔNG nối với `GND` trên board** (netlist: net `GND12` chỉ có J1-3, JP2-7, JP2-8; sơ đồ dùng hai ký hiệu đất riêng, không có net-tie). MAX485 không cách ly, và bộ thu chỉ chịu chế độ chung **−7 V … +12 V** so với GND của nó (`MAX481.PDF` trang 2, điều kiện của VTH và RIN) ⇒ RS485 chỉ chắc chắn đúng khi âm hai nguồn nối với nhau **bên ngoài** board. Bàn test: nối âm 12 V với âm 5 V. **Cần người dùng trả lời trước giai đoạn 2:** harness trên xe có chung âm không? Nếu không — sửa harness, hoặc sửa PCB (nối `GND12` với `GND`), hoặc đổi sang transceiver cách ly.
+1. ~~**Chưa test trên board.**~~ Đã test 2026-10-07, đạt — mục 8.
+2. **`GND12` KHÔNG nối với `GND` trên board** (netlist: net `GND12` chỉ có J1-3, JP2-7, JP2-8; sơ đồ dùng hai ký hiệu đất riêng, không có net-tie). MAX485 không cách ly, và bộ thu chỉ chịu chế độ chung **−7 V … +12 V** so với GND của nó (`MAX481.PDF` trang 2, điều kiện của VTH và RIN) ⇒ RS485 chỉ chắc chắn đúng khi âm hai nguồn nối với nhau **bên ngoài** board. Bàn test: nối âm 12 V với âm 5 V. Người dùng (2026-10-07): đây là **hệ data logger độc lập, không liên quan tới xe**. Việc còn mở: trong hệ đó, nguồn 12 V cho JP2 và nguồn 5 V của harness CAN1 có chung âm không. **Không chặn giai đoạn 2** (bàn test nối chung âm); cần biết trước khi lắp đặt thật. Nếu không chung — nối chung trong dây nguồn, hoặc sửa PCB (nối `GND12` với `GND`), hoặc đổi sang transceiver cách ly.
 3. **JP2 chân 5/6 là +12 V ngay cạnh SWD.** Quy trình test đã ghi: nạp khi chưa cấp +12 V. Lần ra PCB sau nên tách nguồn 12 V khỏi header nạp.
 4. **Cửa sổ MAX485 phát lúc bật nguồn** (reset → `main`) không xoá được bằng firmware. Lần ra PCB sau: R8/R9 xuống GND thay vì lên +5 V ⇒ MAX485 mặc định ở chế độ nhận.
 5. **`VF_Main` không có bản nào của `VF_TH_CAN_Proposal.md`** (kiểm 2026-10-05; module góc thì có ở `VF_Main/docs/VF_Angle/`). Bản gốc thực tế là `docs/VF_TH_CAN_Proposal.md` của repo này — và nó **nằm ngoài vùng `check_contracts` canh**. Việc ở phiên `VF_Main`: thêm `docs/VF_TH/VF_TH_CAN_Proposal.md`.
@@ -213,7 +213,7 @@ Người dùng đánh số **lệch một** so với quy trình (bài 0 của qu
 | 3 | bài 4 | Nhịp L2 | **PASS** — nháy ngắn 2 lần/giây |
 | 3b | — | Live Expressions | không chạy (tuỳ chọn) |
 | 4 | bài 5 | `0x1FFFF7CC` | **PASS** — `0x0040` = 64 KB ⇒ đúng STM32F303**K8** |
-| **5** | — | **PB6 khi firmware đang chạy** | **CHƯA CÓ SỐ** — xem 8.2 |
+| **5** | báo riêng, 2026-10-07 | **PB6 khi firmware đang chạy** | **PASS — PB6 = 0 V** |
 | 5b | — | Độ rộng xung PB6 lúc bật nguồn | không chạy (tuỳ chọn) |
 | 6 | bài 6 | PA10 và STB | **PASS** — cả hai ≈ 3,3 V: TJA1044 ở Standby |
 | 7 | bài 7 | Rút–cắm nguồn, SWD kết nối lại | **PASS** — `.ioc` không tắt SWJ |
@@ -221,23 +221,28 @@ Người dùng đánh số **lệch một** so với quy trình (bài 0 của qu
 | 8b | bài 8b | Analyzer phát, không ai khác trên bus | **PASS** — không có ACK ⇒ **module không ACK** |
 | 8c | bài 8c | Bus CAN1 thật | **PASS** — không có gì trong `0x400`–`0x49F` |
 | 9 | bài 9 | Cắm/rút cảm biến 3 lần | **PASS** — không có gì xảy ra |
-| — | — | Dòng tiêu thụ 5 V / 12 V | chưa đo (chỉ là mốc) |
-| — | — | Harness trên xe có chung âm 5 V / 12 V? | **chưa trả lời** |
+| — | — | Dòng tiêu thụ 5 V / 12 V | bỏ qua (người dùng — chỉ là mốc) |
+| — | — | Chung âm 5 V / 12 V? | hệ data logger độc lập, không liên quan tới xe — xem việc mở 7.2 |
 
 ## 8.1 Điều đã được chứng minh
 
 - **R8/R9 có lắp trên board thật** (bài 0: PB6 = 5 V khi MCU bị giữ reset). Bẫy CLAUDE.md §4.3 là có thật, không phải chỉ trên netlist: **từ lúc có điện tới `app_board_early_guard()`, MAX485 đang phát**.
+- **Và firmware thắng được R8/R9** (bài 5: PB6 = **0 V** khi chạy) — B6 #1. Cặp số 5 V / 0 V của bài 0 và bài 5 là bằng chứng trực tiếp duy nhất: bài 9 không thay được (giai đoạn 1 không nói chuyện với cảm biến, nên MAX485 phát hay nhận thì cũng "không có gì xảy ra"), đo A/B cũng không (driver bật với DI = 1 cho cùng cực tính với phân cực fail-safe).
 - **Trong lúc MCU reset, STB vẫn ở mức cao (3,3 V)** dù PA10 thả nổi — cùng mức với lúc firmware chủ động giữ Standby (bài 6). Tức là có thứ giữ STB lên khi không ai lái nó (nhiều khả năng là pull-up nội của TJA1044; datasheet không có trong repo). Hệ quả: **transceiver không vào Normal trong cửa sổ reset**. Bài 8a (rút–cắm nguồn 5 lần khi analyzer nghe, không một error frame nào) xác nhận cùng điều đó từ phía bus.
 - **Module im lặng trên CAN1, cả phát lẫn ACK** (8a, 8b, 8c). 8b là phép thử thật của B6 #3: analyzer là node duy nhất còn lại và không nhận được ACK.
 - **SWD sống sót qua mất nguồn** (bài 7).
 - **Chip là K8, 64 KB** (bài 4) — phân vùng bootloader 12 KB + ứng dụng 52 KB của phase 5 đứng vững.
 - Nhịp 2 lần/giây ⇒ SysTick đúng 1 ms ⇒ gián tiếp xác nhận PLL 72 MHz lên từ HSE 8 MHz. HSE chết thì `Error_Handler` đã nháy mã 1.
 
-## 8.2 Còn thiếu để khép giai đoạn 1
+## 8.2 Tiêu chí nghiệm thu — cả 6 đạt
 
-**Bài 5 — PB6 so GND khi firmware đang chạy, mong đợi ≈ 0 V.** Đây là B6 #1 của prompt, và là phép đo duy nhất chứng minh trực tiếp rằng firmware **thắng** được R8/R9. Bài 0 chỉ chứng minh cái bẫy có thật; các bài còn lại không thay được nó:
+| # | Tiêu chí | Kết quả |
+|---|---|---|
+| 1 | Build 0 error, mọi warning được giải thích | 0 error, 0 warning (IDE + headless) |
+| 2 | `check_contracts.sh` chứng minh fail được | mục 4: lệch 1 byte và sót DBC cũ đều dừng build |
+| 3 | Báo cáo flash/RAM, dung lượng MCU đã xác nhận | mục 5; trên chip `0x1FFFF7CC` = `0x0040` |
+| 4 | LED nháy, duty ≤ 10% | bài 3; duty kiểm ở thì biên dịch |
+| 5 | Ba phép đo B6 đạt | PB6 = 0 V (bài 5), PA10/STB ≈ 3,3 V (bài 6), không ACK (bài 8b) |
+| 6 | Quy trình test ở `docs/VF_TH_Phase1_Test.md` | có, và đã chạy |
 
-- Bài 9 đạt không chứng minh được PB6 thấp: giai đoạn 1 không nói chuyện với cảm biến, nên MAX485 phát hay nhận thì cũng "không có gì xảy ra".
-- Đo A/B cũng không thay được: driver bật với DI = 1 cho ra cùng cực tính với phân cực fail-safe (quy trình mục 4).
-
-Nếu bài 5 ra ≈ 5 V thì giai đoạn 2 sẽ không bao giờ nhận được trả lời của cảm biến, và nguyên nhân sẽ trông giống hệt một lỗi dây.
+**Giai đoạn 1 khép lại 2026-10-07.** Các việc còn mở ở mục 7 (trừ mục 1) chuyển sang CLAUDE.md §7.2 và kế hoạch giai đoạn 2.
