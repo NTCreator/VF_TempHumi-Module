@@ -16,6 +16,7 @@
 #define APP_APP_DIAG_H
 
 #include "app/app_can.h"
+#include "app/app_cfg_store.h"
 #include "app/app_th.h"
 
 #include <stdint.h>
@@ -34,8 +35,11 @@ typedef struct
   /* Phase 2: the sensor transactions - see app_th.h */
   app_th_diag_t th;
 
-  /* Phase 3: CAN1 in silent loopback - see app_can.h */
+  /* Phase 3: CAN1 - see app_can.h. From phase 4: NORMAL with a valid config */
   app_can_diag_t can;
+
+  /* Phase 4: the config as read at boot - see app_cfg_store.h */
+  app_cfg_diag_t cfg;
 } app_diag_t;
 
 extern app_diag_t g_diag;

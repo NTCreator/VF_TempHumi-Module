@@ -24,6 +24,7 @@
 /* TJA1044 STB via R2: LOW = Normal, HIGH = Standby (CLAUDE.md 4.1). Naming the
    level keeps the polarity from having to be remembered at a call site. */
 #define BOARD_CAN_STB_STANDBY   GPIO_PIN_SET
+#define BOARD_CAN_STB_NORMAL    GPIO_PIN_RESET
 
 /* L2 hangs from +3V3 through R5 into PB0: the pin sinks, so LOW lights it. */
 #define BOARD_LED_LIT           GPIO_PIN_RESET
@@ -65,6 +66,31 @@ void app_board_enter_safe_state(void)
   HAL_GPIO_WritePin(ENA_RS485_GPIO_Port, ENA_RS485_Pin, BOARD_RS485_RECEIVE);
   HAL_GPIO_WritePin(EN_CAN1_GPIO_Port, EN_CAN1_Pin, BOARD_CAN_STB_STANDBY);
   HAL_GPIO_WritePin(LED_DEBUG_GPIO_Port, LED_DEBUG_Pin, BOARD_LED_DARK);
+}
+
+bool app_board_can_transceiver_normal(const app_cfg_t *proof)
+{
+  /* The check is here, not left to the caller. A module that reaches the bus
+     with an unvalidated node_id is the one failure that takes other boards
+     down with it (CLAUDE.md 1.2): no caller - however it got its pointer -
+     can pull PA10 low without a config that passes every check. */
+  if ((proof == NULL) || !app_cfg_valid(proof))
+  {
+    HAL_GPIO_WritePin(EN_CAN1_GPIO_Port, EN_CAN1_Pin, BOARD_CAN_STB_STANDBY);
+    return false;
+  }
+  HAL_GPIO_WritePin(EN_CAN1_GPIO_Port, EN_CAN1_Pin, BOARD_CAN_STB_NORMAL);
+  return true;
+}
+
+void app_board_can_transceiver_standby(void)
+{
+  HAL_GPIO_WritePin(EN_CAN1_GPIO_Port, EN_CAN1_Pin, BOARD_CAN_STB_STANDBY);
+}
+
+uint8_t app_board_can_stb_level(void)
+{
+  return (HAL_GPIO_ReadPin(EN_CAN1_GPIO_Port, EN_CAN1_Pin) == GPIO_PIN_SET) ? 1u : 0u;
 }
 
 void app_board_rs485_release(void)

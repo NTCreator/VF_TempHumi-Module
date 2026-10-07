@@ -26,6 +26,7 @@
 /* USER CODE BEGIN Includes */
 #include "app/app_board.h"
 #include "app/app_can.h"
+#include "app/app_cfg_store.h"
 #include "app/app_config.h"
 #include "app/app_diag.h"
 #include "app/app_fault.h"
@@ -56,7 +57,7 @@
    SWD only and USART1 belongs to the sensor - so it lives in the image instead:
    a debugger watch on s_fw_id, or `strings VF_TempHumi_Module.elf`, shows it.
    main() anchors it for the linker - see USER CODE 2. */
-static const char s_fw_id[] = "VF_TempHumi_Module phase " APP_FW_PHASE;
+static const char s_fw_id[] = "VF_TempHumi_Module phase " APP_FW_PHASE APP_FW_BENCH_TAGS;
 
 /* USER CODE END PV */
 
@@ -118,10 +119,11 @@ int main(void)
          on the measurement bus. A duplicate node_id takes the bus down, it
          does not just make the log messy (CLAUDE.md 1.2).
 
-     From phase 3, app_can_init() below restarts bxCAN in silent loopback:
-     CANTX held recessive, no ACK given - behind a transceiver in standby.
-     Silent on CAN1 twice over, and nothing in this firmware can change
-     either until phase 4 brings a CRC-checked config. */
+     From phase 4 the CAN state comes from the config in flash, decided once in
+     app_can_init(): no valid config - a blank page included - means silent
+     loopback, transceiver in standby and the node_id gate closed. Only a
+     config that passes every check can put the transceiver in Normal, and
+     only after bxCAN has started. */
   app_board_enter_safe_state();
 
   /* Nothing reads s_fw_id, so --gc-sections would drop it, and this
@@ -131,9 +133,12 @@ int main(void)
   __asm__ volatile ("" : : "r" (s_fw_id));
 
   /* g_diag first (the others fill it), the LED before anything that can
-     raise a fault (its init clears pending codes). */
+     raise a fault (its init clears pending codes). The config before the
+     sensor (a bench erase stalls the CPU; no Modbus transaction may be in
+     flight) and before CAN (which asks it for the node_id). */
   app_diag_init();
   app_led_init(HAL_GetTick());
+  app_cfg_boot();
   app_th_init(HAL_GetTick());
   app_can_init(HAL_GetTick());
 

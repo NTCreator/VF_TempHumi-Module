@@ -17,7 +17,7 @@
 CC      = gcc
 CFLAGS  := -std=c11 -Wall -Wextra -Werror -Wdouble-promotion -Wfloat-conversion -Wconversion -O2 -I../Core/Inc
 
-TESTS   := test_drv_modbus test_app_meas test_app_frame test_dbc_layout
+TESTS   := test_drv_modbus test_app_meas test_app_frame test_dbc_layout test_app_cfg
 
 # contracts/ holds exactly one DBC by rule (contracts/README.md). All matches
 # are passed on: if there are none or two, test_dbc_layout refuses to run.
@@ -41,6 +41,9 @@ test_app_frame.exe: test_app_frame.c ../Core/Src/app/app_frame.c
 	$(CC) $(CFLAGS) -o $@ $^
 
 test_dbc_layout.exe: test_dbc_layout.c ../Core/Src/app/app_frame.c
+	$(CC) $(CFLAGS) -o $@ $^
+
+test_app_cfg.exe: test_app_cfg.c ../Core/Src/app/app_cfg.c
 	$(CC) $(CFLAGS) -o $@ $^
 
 clean:

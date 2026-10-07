@@ -21,26 +21,39 @@
    wired to the sensor, not out of the board. "Printed at boot" therefore means
    embedded in the image, where a debugger or `strings` on the .elf finds it -
    see s_fw_id in main.c. */
-#define APP_FW_PHASE              "3"      /* bump each phase */
+#define APP_FW_PHASE              "4"      /* bump each phase */
 #define APP_FW_VERSION            1u       /* TH_Status byte 0, FwVersion (proposal 5.2) */
 
 /* ---- Memory - STM32F303K8T6 -------------------------------------- */
 /* Confirmed 2026-10-05 in the CubeMX MCU database, not taken from the IOC
  * guide: STM32CubeMX/db/mcu/STM32F303K(6-8)Tx.xml lists <Flash> 32 (K6) and
- * 64 (K8), <Ram> 12, <CCMRam> 4. The generated STM32F303K8TX_FLASH.ld agrees:
- * FLASH 64K @ 0x08000000, RAM 12K @ 0x20000000, CCMRAM 4K @ 0x10000000.
+ * 64 (K8), <Ram> 12, <CCMRam> 4. The generated STM32F303K8TX_FLASH.ld agreed:
+ * FLASH 64K @ 0x08000000, RAM 12K @ 0x20000000, CCMRAM 4K @ 0x10000000
+ * (FLASH cut to 50K by hand in phase 4 - see the flash map below).
  * On the chip itself the flash size register at 0x1FFFF7CC reads 0x0040
  * (docs/VF_TH_Phase1_Test.md, test 1).
  *
- * Phase 5 splits flash as docs/VF_TH_IOC_Guide.md A9 decided: bootloader
- * 12 KB at 0x08000000, application at 0x08003000. Until then the application
- * links at 0x08000000 and must stay inside APP_APP_FLASH_KB so that moving it
- * later is a linker change, not a diet. */
+ * Flash map (phase 4 corrected the application size - phases 1-3 said 52 KB
+ * and forgot the config page):
+ *
+ *   0x08000000  bootloader   12 KB   (phase 5; docs/VF_TH_IOC_Guide.md A9)
+ *   0x08003000  application  50 KB   (links at 0x08000000 until phase 5)
+ *   0x0800F800  config        2 KB   the last page - F3 pages are 2 KB
+ *                                    (FLASH_PAGE_SIZE 0x800, stm32f3xx_hal_flash_ex.h)
+ *
+ * The linker script holds the application to 50K (user edit, phase 4), and
+ * tools/check_linker.sh fails the build if a CubeMX Generate ever puts it
+ * back to 64K: an application that reaches the config page would erase it
+ * by being flashed. */
 #define APP_MCU_FLASH_KB          64u
 #define APP_MCU_SRAM_KB           12u
 #define APP_MCU_CCMRAM_KB         4u
 #define APP_BOOT_FLASH_KB         12u
-#define APP_APP_FLASH_KB          (APP_MCU_FLASH_KB - APP_BOOT_FLASH_KB)   /* 52 KB */
+#define APP_CFG_PAGE_KB           2u
+#define APP_APP_FLASH_KB          (APP_MCU_FLASH_KB - APP_BOOT_FLASH_KB - APP_CFG_PAGE_KB)  /* 50 KB */
+#define APP_FLASH_BASE_ADDR       0x08000000u
+/* tools/check_linker.sh reads this line: keep it a plain hex literal. */
+#define APP_CFG_FLASH_ADDR        0x0800F800u
 
 /* ---- Module type and node_id ------------------------------------- */
 /* Contract: VF_Main_CAN_ID_Map.md v1.3 section 2.1, proposal section 2.
@@ -85,16 +98,52 @@
 #define APP_CAN_STATUS_OFFSET     2u
 #define APP_FRAME_DLC             8u
 
-/* Phase 3 only: there is no config store yet (phase 4), so the node_id is a
- * constant - label 1. It is harmless ONLY because phase 3 has no way onto
- * the wire: bxCAN in silent loopback, transceiver in standby, and no
- * function exists that would change either. Phase 4 deletes this constant
- * and takes the node_id from a CRC-checked config; there is no other source.
- * The gate test sets it to APP_NODE_ID_UNSET (0xFF). */
-#define APP_CAN_NODE_ID_PHASE3    0x30u
+/* The node_id comes from the CRC-checked config in flash (app_cfg_store) and
+ * from nowhere else. Phase 3's compile-time constant is gone on purpose. */
 
 /* TH_Status CmdSeq until commands exist (phase 6). */
 #define APP_CMD_SEQ_NONE          0u
+
+/* ---- Bench switches - ALL 0 IN ANY BUILD THAT LEAVES THE BENCH ----- */
+/* Until phase 5 brings the bootloader and the CAN2 protocol, these are the
+ * only way a config gets into flash. Each one that is set shows three ways:
+ * a #warning when building app_cfg_store.c, a flag in g_diag.cfg, and a tag
+ * in s_fw_id.
+ *
+ * APP_CFG_BENCH_WRITE  1 = at boot, if the stored config is NOT valid, write
+ *                      the bench config (node APP_NODE_ID_BENCH). Default 0:
+ *                      a blank page can be tested only once (the vibration
+ *                      module lost it to a write switch that defaulted to 1),
+ *                      so the first flash of phase 4 IS the blank-page test.
+ * APP_CFG_BENCH_ERASE  1 = at boot, erase the config page: back to blank.
+ * APP_BENCH_CAN_LOOPBACK 1 = even with a valid config, stay in silent
+ *                      loopback with the transceiver in standby. Only ever
+ *                      makes the module quieter, never louder. */
+#define APP_CFG_BENCH_WRITE       0
+#define APP_CFG_BENCH_ERASE       0
+#define APP_BENCH_CAN_LOOPBACK    0
+#define APP_NODE_ID_BENCH         0x30u    /* label 1 */
+
+#if APP_CFG_BENCH_WRITE && APP_CFG_BENCH_ERASE
+#error "BENCH_WRITE and BENCH_ERASE together erase and rewrite the page on every boot"
+#endif
+
+#if APP_CFG_BENCH_WRITE
+#define APP_FW_TAG_WRITE          " BENCH_WRITE"
+#else
+#define APP_FW_TAG_WRITE          ""
+#endif
+#if APP_CFG_BENCH_ERASE
+#define APP_FW_TAG_ERASE          " BENCH_ERASE"
+#else
+#define APP_FW_TAG_ERASE          ""
+#endif
+#if APP_BENCH_CAN_LOOPBACK
+#define APP_FW_TAG_LOOPBACK       " BENCH_LOOPBACK"
+#else
+#define APP_FW_TAG_LOOPBACK       ""
+#endif
+#define APP_FW_BENCH_TAGS         APP_FW_TAG_WRITE APP_FW_TAG_ERASE APP_FW_TAG_LOOPBACK
 
 /* ---- SHT RS485 sensor - SHT datasheet ---------------------------- */
 #define SHT_SLAVE_ADDR_DEFAULT    0x01u    /* p.6 "Note": factory address 1 */
@@ -250,7 +299,11 @@ _Static_assert(MB_RX_BUF_LEN > 3u + 2u * MB_READ_MAX_REGS + 2u, "RX buffer must 
 _Static_assert(APP_TH_AGE_MAX < APP_TH_AGE_NEVER, "a saturated age must never read as 'never read'");
 _Static_assert(APP_TH_SILENT_LED_MS > MB_FIRST_POLL_MS, "LED code 2 must not show before the first poll");
 
-/* The application must already fit the region it will move to in phase 5. */
-_Static_assert(APP_APP_FLASH_KB == 52u, "IOC guide A9: 64 KB - 12 KB bootloader");
+/* The flash map adds up, and the config page is the last page. */
+_Static_assert(APP_BOOT_FLASH_KB + APP_APP_FLASH_KB + APP_CFG_PAGE_KB == APP_MCU_FLASH_KB,
+               "flash map: 12 + 50 + 2 = 64 KB");
+_Static_assert(APP_CFG_FLASH_ADDR == APP_FLASH_BASE_ADDR + (APP_MCU_FLASH_KB - APP_CFG_PAGE_KB) * 1024u,
+               "the config page is the last 2 KB page of 64 KB");
+_Static_assert(APP_NODE_ID_OK(APP_NODE_ID_BENCH), "the bench config must be a valid node of type 0x3");
 
 #endif /* APP_APP_CONFIG_H */

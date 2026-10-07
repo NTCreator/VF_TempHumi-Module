@@ -16,9 +16,10 @@
   *                   unconfigured module must never reach Normal: a duplicate
   *                   node_id takes the whole CAN1 bus down (CLAUDE.md 1.2).
   *
-  * Deliberately missing: a call that puts the transceiver in Normal (phase 4,
-  * and it will demand a CRC-checked config as its argument), and any exported
-  * call that raises DE. Raising DE lives in drv_rs485.c as a static function,
+  * The call that puts the transceiver in Normal exists from phase 4, and it
+  * demands a valid config as its argument: "only a CRC-checked config may
+  * pull PA10 low" is a property of the function, not a promise of its
+  * callers. Deliberately missing: any exported call that raises DE. Raising DE lives in drv_rs485.c as a static function,
   * paired with the transmit-complete interrupt that drops it again
   * (docs/VF_TH_IOC_Guide.md A8). A function that does not exist cannot be
   * called by mistake. Releasing the bus is always safe, so that one is here.
@@ -27,7 +28,26 @@
 #ifndef APP_APP_BOARD_H
 #define APP_APP_BOARD_H
 
+#include "app/app_cfg.h"
+
 #include <stdbool.h>
+#include <stdint.h>
+
+/**
+  * @brief TJA1044 to Normal: this module can now drive CAN1. Phase 4.
+  *
+  * Takes the config as proof and checks it itself (app_cfg_valid). NULL or
+  * anything invalid: the transceiver is put in standby and false returned.
+  * Call only after HAL_CAN_Start() succeeded in NORMAL mode.
+  */
+bool app_board_can_transceiver_normal(const app_cfg_t *proof);
+
+/** @brief TJA1044 to standby: TXD is cut from the bus. Always safe. */
+void app_board_can_transceiver_standby(void);
+
+/** @brief PA10 as the pin reads (IDR): 1 = standby, 0 = Normal. What a
+  *        multimeter would show, from the firmware's side. */
+uint8_t app_board_can_stb_level(void);
 
 /**
   * @brief Release the RS485 bus and keep CAN1 in standby, before anything else.

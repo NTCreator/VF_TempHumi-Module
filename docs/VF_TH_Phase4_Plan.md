@@ -1,6 +1,6 @@
 # Giai đoạn 4 — Kế hoạch: kho config trong flash, và lần phát thật đầu tiên
 
-**Trạng thái: CHỜ DUYỆT** (2026-10-07). Chưa viết dòng code nào. Ba câu hỏi ở mục 11.
+**Trạng thái: ĐÃ DUYỆT 2026-10-07** — câu hỏi 1: người dùng đã sửa linker `LENGTH = 50K`, thêm `check_linker`; câu hỏi 2: mã 3; câu hỏi 3: mainboard `VF_Main` `41ad090` (chứa `86aec85`, đã kiểm) ⇒ bài 9 làm ngay ở GĐ 4.
 
 Căn cứ: CAN2 Protocol v1.5 §4, §4.1, §4.2, §5 (bất biến 2, 3, 5); ID Map v1.3 §2.1, §2.3; DBC v1.5; kết quả GĐ 3; cách module góc làm giai đoạn 6a-1 (`VF_Angle_Module/docs/VF_Angle_Phase6a1_Plan.md`) — chép cách làm, không chép code.
 

@@ -42,9 +42,14 @@ typedef enum
                                APP_TH_SILENT_LED_MS after boot, or while the reading is
                                STALE, and drops it when readings return. Phase 2 plan,
                                question 1, option A, approved 2026-10-07 */
-  /* 3 = no valid config (phase 4) and 4 are kept free: VF_Angle_Module uses
-     3 for the config and 4 for "sensor stopped delivering", which code 2
-     covers here. */
+  APP_FAULT_CFG_CRC   = 3,  /* no valid config in flash - a blank page included. The module
+                               is SILENT on CAN1 and this is the only thing that says why.
+                               LATCHED, not fatal: the sensor keeps being read, for g_diag.
+                               Detail = app_cfg_state_t (1 blank .. 7 reserved). Wins over
+                               the live code 2. Same number and meaning as VF_Angle_Module.
+                               Phase 4 plan, question 2, approved 2026-10-07 */
+  /* 4 is kept free: VF_Angle_Module uses it for "sensor stopped delivering",
+     which code 2 covers here. */
   APP_FAULT_CAN       = 5   /* bxCAN init, filter or start failed. LATCHED but NOT fatal:
                                the module keeps measuring, it just cannot speak. Detail =
                                step (1 init, 2 filter, 3 start) << 8 | HAL error code low
