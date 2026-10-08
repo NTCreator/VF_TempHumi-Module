@@ -17,7 +17,13 @@
 CC      = gcc
 CFLAGS  := -std=c11 -Wall -Wextra -Werror -Wdouble-promotion -Wfloat-conversion -Wconversion -O2 -I../Core/Inc
 
-TESTS   := test_drv_modbus test_app_meas test_app_frame test_dbc_layout test_app_cfg
+TESTS   := test_drv_modbus test_app_meas test_app_frame test_dbc_layout test_app_cfg \
+           test_boot_svc test_boot_policy test_boot_led
+
+# Phase 5: the bootloader's pure modules. Its headers come after the
+# application's, as in the bootloader's own include path.
+BOOT    := ../VF_TempHumi_Bootloader/Core
+BOOT_INC := -I$(BOOT)/Inc
 
 # contracts/ holds exactly one DBC by rule (contracts/README.md). All matches
 # are passed on: if there are none or two, test_dbc_layout refuses to run.
@@ -45,6 +51,15 @@ test_dbc_layout.exe: test_dbc_layout.c ../Core/Src/app/app_frame.c
 
 test_app_cfg.exe: test_app_cfg.c ../Core/Src/app/app_cfg.c
 	$(CC) $(CFLAGS) -o $@ $^
+
+test_boot_svc.exe: test_boot_svc.c $(BOOT)/Src/app/boot_svc.c ../Core/Src/app/app_cfg.c
+	$(CC) $(CFLAGS) $(BOOT_INC) -o $@ $^
+
+test_boot_policy.exe: test_boot_policy.c ../Core/Src/app/app_cfg.c
+	$(CC) $(CFLAGS) $(BOOT_INC) -o $@ $^
+
+test_boot_led.exe: test_boot_led.c
+	$(CC) $(CFLAGS) $(BOOT_INC) -o $@ $^
 
 clean:
 	rm -f *.exe

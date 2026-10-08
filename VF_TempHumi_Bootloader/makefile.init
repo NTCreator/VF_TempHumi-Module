@@ -1,0 +1,45 @@
+################################################################################
+# makefile.init - hand written, NOT generated. Do not delete.
+#
+# Same mechanism as the application's makefile.init one level up:
+# Debug/makefile opens with "-include ../makefile.init", a CDT hook that
+# CubeMX and CubeIDE never write.
+#
+# Two checks, both from the repository's tools/:
+#   check_contracts.sh  the bootloader IS the module side of the CAN2 service
+#                       protocol, one of the contracts in ../contracts/. If
+#                       VF_Main moves it and this copy has not followed, the
+#                       bootloader must not build either.
+#   check_linker.sh     the bootloader's FLASH region must end where the
+#                       application begins (12 KB). A CubeMX Generate puts it
+#                       back to 64K without a word - and a bootloader flashed
+#                       over the application region is erased by the next
+#                       application flash, or erases it.
+################################################################################
+
+# "make clean" stays usable: getting back to a known state must never be the
+# thing that is blocked.
+ifneq ($(MAKECMDGOALS),clean)
+
+# Included from VF_TempHumi_Bootloader/Debug/, so this resolves to "../", the
+# bootloader project; the repository root, with tools/ and contracts/, is one
+# level above it.
+VF_BOOT_ROOT       := $(dir $(lastword $(MAKEFILE_LIST)))
+VF_CHECK_CONTRACTS := $(VF_BOOT_ROOT)../tools/check_contracts.sh
+VF_CHECK_LINKER    := $(VF_BOOT_ROOT)../tools/check_linker.sh
+
+# The scripts write their own reports; only the exit codes are captured, so a
+# multi line failure message reaches the terminal with its line breaks intact.
+VF_CONTRACTS_RC := $(shell sh "$(VF_CHECK_CONTRACTS)" >&2; echo $$?)
+
+ifneq ($(VF_CONTRACTS_RC),0)
+$(error contracts/ no longer matches VF_Main - see the report above. Fix the mismatch; running check_contracts.sh --update just to clear this defeats the point)
+endif
+
+VF_LINKER_RC := $(shell sh "$(VF_CHECK_LINKER)" boot >&2; echo $$?)
+
+ifneq ($(VF_LINKER_RC),0)
+$(error the bootloader linker script leaves its 12 KB - see the report above)
+endif
+
+endif
